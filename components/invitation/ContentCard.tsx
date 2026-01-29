@@ -8,7 +8,15 @@ import MenghitungHariContent from './MenghitungHariContent'
 import DoaContent from './DoaContent'
 import RSVPContent from './RSVPContent'
 import ResponseContent from './ResponseContent'
+import AnimatedSection from './AnimatedSection'
+import AnimatedDivider from './AnimatedDivider'
 
+/**
+ * ContentCard Component
+ * 
+ * Main content card with scroll-triggered animations.
+ * Each section animates into view as user scrolls down.
+ */
 export default function ContentCard() {
   const cardVariants = {
     initial: { opacity: 0, scale: 0.95 },
@@ -36,54 +44,62 @@ export default function ContentCard() {
         overflow-hidden
       "
     >
-      {/* Full-card gradient background (NOW covers Mukadimah + Details) */}
+      {/* Full-card gradient background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-cream-50 via-white to-cream-100/60" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.04),transparent_55%)]" />
 
       {/* Subtle texture overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj48cGF0aCBkPSJNMCAwaDE2djE2SDB6IiBmaWxsPSJub25lIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDMiLz48L3N2Zz4=')] opacity-40" />
 
-      {/* Content */}
+      {/* Content with scroll-triggered animations */}
       <div className="relative z-20 mx-auto flex w-full max-w-[560px] flex-col items-center px-6 py-12 text-center sm:py-16">
         <div className="w-full space-y-8 sm:space-y-10">
-          <MukadimahContent />
+          
+          {/* Mukadimah - fade up */}
+          <AnimatedSection type="fade-up">
+            <MukadimahContent />
+          </AnimatedSection>
 
-          {/* Divider (same style as Mukadimah divider) */}
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider />
 
-          <DetailsContent />
+          {/* Details - scale for emphasis */}
+          <AnimatedSection type="scale" delay={0.5}>
+            <DetailsContent />
+          </AnimatedSection>
 
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider delay={0.1} />
 
-          <AturCaraContent />
+          {/* Atur Cara - fade up */}
+          <AnimatedSection type="fade-up" delay={0.5}>
+            <AturCaraContent />
+          </AnimatedSection>
 
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider delay={0.1} />
 
-          <MenghitungHariContent />
+          {/* Menghitung Hari - scale for special emphasis */}
+          <AnimatedSection type="scale" delay={0.5}>
+            <MenghitungHariContent />
+          </AnimatedSection>
 
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider delay={0.1} />
 
-          <DoaContent />
+          {/* Doa - fade up */}
+          <AnimatedSection type="fade-up" delay={0.5}>
+            <DoaContent />
+          </AnimatedSection>
 
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider delay={0.1} />
 
-          <RSVPContent />
+          {/* RSVP - scale for important call-to-action */}
+          <AnimatedSection type="scale" delay={0.5}>
+            <RSVPContent />
+          </AnimatedSection>
 
-          <div className="flex items-center justify-center py-1">
-            <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-          </div>
+          <AnimatedDivider delay={0.1} />
 
-          <ResponseContent/>
+          {/* Response - fade up */}
+            <ResponseContent />
+
         </div>
       </div>
 
