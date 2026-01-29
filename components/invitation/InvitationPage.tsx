@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import InvitationCard from './InvitationCard';
 import MusicSection from './MusicSection';
@@ -8,6 +8,7 @@ import BottomAppBar from './BottomAppBar';
 import EntranceScreen from './EntranceScreen';
 import FloatingMuteButton from './FloatingMuteButton';
 import PageTransition from './PageTransition';
+import ContentCard from './ContentCard';
 
 type PageType = 'cover' | 'music';
 
@@ -29,6 +30,9 @@ export default function InvitationPage() {
     // Play audio when user enters
     if (audioRef.current) {
       try {
+        // Set starting position to 72/113/138/144 seconds for a better intro
+        audioRef.current.currentTime = 138;
+        
         await audioRef.current.play();
         setIsPlaying(true);
       } catch (error) {
@@ -69,7 +73,7 @@ export default function InvitationPage() {
         loop
         preload="auto"
       >
-        <source src="/music/Malam Bulan Dipagar Bintang.mp3" type="audio/mpeg" />
+        <source src="/music/MusicBackground.mp3" type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
 
@@ -113,52 +117,45 @@ export default function InvitationPage() {
             <PageTransition key="cover" type="cover">
               {/* Cover Page Content */}
               <main className="
-                min-h-screen
-                px-4
-                py-8
-                pb-28
-                sm:px-6
-                sm:py-12
-                sm:pb-32
-                md:px-8
-                md:py-16
-                flex
-                flex-col
-                items-center
-                justify-center
-              ">
-                <InvitationCard />
-
-                {/* View Music Button */}
-                <button
-                  onClick={goToMusicPage}
-                  className="
-                    mt-8
-                    px-6
-                    py-3
-                    bg-gradient-to-r
-                    from-amber-700
-                    to-amber-800
-                    text-white
-                    rounded-full
-                    font-medium
-                    text-sm
-                    tracking-wide
-                    shadow-lg
-                    hover:shadow-xl
-                    hover:from-amber-800
-                    hover:to-amber-900
-                    transition-all
-                    duration-300
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-amber-300/50
-                    focus:ring-offset-2
-                  "
-                >
-                  🎵 Dengar Lagu Kami
-                </button>
-              </main>
+              pb-28 sm:pb-32
+              relative
+              overflow-hidden"
+              >
+                {/* InvitationCard - The curtain (slides up to reveal) */}
+                <div className="
+                  min-h-screen
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  px-0 sm:px-6 md:px-8
+                  sticky
+                  top-0
+                  z-10
+                  bg-cream-100  
+                  from-cream-100
+                  via-amber-50/50
+                  to-stone-100
+                ">
+                  <InvitationCard />
+                </div>
+                {/* ContentCard - The stage (always behind) */}
+                <div className="
+                  min-h-screen
+                  flex
+                  top-alignment
+                  justify-center
+                  px-0 sm:px-6 md:px-8
+                  relative 
+                  top-0
+                  left-0
+                  right-0 
+                  z-0
+                  -mt-screen
+                ">
+                  <ContentCard />
+                </div>
+                </main>
             </PageTransition>
           )}
 
@@ -223,7 +220,7 @@ export default function InvitationPage() {
       {hasEntered && <FloatingMuteButton audioRef={audioRef} />}
 
       {/* Bottom Navigation Bar - Fixed */}
-      <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />
+      {hasEntered && <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />}
     </div>
   );
 }

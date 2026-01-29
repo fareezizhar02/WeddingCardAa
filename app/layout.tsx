@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Montserrat } from 'next/font/google';
+import { Montserrat,Playfair_Display, Great_Vibes} from 'next/font/google';
 import './globals.css';
 
 /**
@@ -8,12 +8,12 @@ import './globals.css';
  * - Cormorant Garamond: Elegant serif for headings and decorative text
  * - Montserrat: Clean, refined sans-serif for body text
  */
-const cormorant = Cormorant_Garamond({
-  weight: ['300', '400', '500', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-cormorant',
-});
+// const cormorant = Cormorant_Garamond({
+//   weight: ['300', '400', '500', '600', '700'],
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-cormorant',
+// });
 
 const montserrat = Montserrat({
   weight: ['300', '400', '500', '600', '700'],
@@ -21,6 +21,20 @@ const montserrat = Montserrat({
   display: 'swap',
   variable: '--font-montserrat',
 });
+
+export const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
+
+export const greatVibes = Great_Vibes({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-greatvibes',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Fareez & Zanis - Wedding Invitation',
@@ -34,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${montserrat.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${greatVibes.variable} ${montserrat.variable}`}>
       <body className="font-sans antialiased">
         {children}
       </body>

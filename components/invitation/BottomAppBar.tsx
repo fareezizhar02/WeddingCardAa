@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Music, Calendar, MapPin } from 'lucide-react';
+import { Phone, Music, Calendar, MapPin, Mail, Heart } from 'lucide-react';
 import ContactSheet from './ContactSheet';
+import RSVPSheet from './RSVPSheet';
+import CalendarSheet from './CalendarSheet';
+import LocationSheet from './LocationSheet';
 
 type PageType = 'cover' | 'music';
 
@@ -15,13 +18,19 @@ interface BottomAppBarProps {
 /**
  * BottomAppBar Component
  * 
- * Fixed bottom navigation bar with four action buttons.
+ * Fixed bottom navigation bar with five action buttons.
  * Features blur effect, elegant styling, and tap animations.
+ * RSVP is prominently placed in the center.
  */
 export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarProps) {
   const [isContactSheetOpen, setIsContactSheetOpen] = useState(false);
+  const [isRSVPSheetOpen, setIsRSVPSheetOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [isLocationOpen, setIsLocationOpen] = useState(false)
 
-  // Button configuration
+  const closeCalendar = () => setIsCalendarOpen(false)
+
+  // Button configuration - RSVP in the center
   const buttons = [
     {
       id: 'contact',
@@ -37,16 +46,23 @@ export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarPr
       isActive: currentPage === 'music',
     },
     {
+      id: 'rsvp',
+      label: 'RSVP',
+      icon: Mail,
+      onClick: () => setIsRSVPSheetOpen(true),
+      isCenter: true,
+    },
+    {
       id: 'calendar',
       label: 'Kalendar',
       icon: Calendar,
-      onClick: () => console.log('Calendar clicked'),
+      onClick: () => setIsCalendarOpen(true),
     },
     {
       id: 'location',
       label: 'Lokasi',
       icon: MapPin,
-      onClick: () => console.log('Location clicked'),
+      onClick: () => setIsLocationOpen(true),
     },
   ];
 
@@ -120,7 +136,88 @@ export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarPr
           {buttons.map((button) => {
             const Icon = button.icon;
             const isActive = button.isActive || false;
+            const isCenter = button.isCenter || false;
             
+            // Center RSVP button gets special styling
+            if (isCenter) {
+              return (
+                <motion.button
+                  key={button.id}
+                  variants={buttonVariants}
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.08 }}
+                  onClick={button.onClick}
+                  className="
+                    relative
+                    flex
+                    flex-col
+                    items-center
+                    justify-center
+                    gap-1
+                    flex-1
+                    max-w-[120px]
+                    py-3
+                    px-4
+                    rounded-2xl
+                    bg-gradient-to-br
+                    from-amber-600
+                    to-amber-700
+                    shadow-lg
+                    shadow-amber-500/30
+                    hover:shadow-xl
+                    hover:shadow-amber-500/40
+                    transition-all
+                    duration-200
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-amber-400/50
+                    focus:ring-offset-2
+                  "
+                  aria-label={button.label}
+                >
+                  {/* Subtle pulse animation */}
+                  <motion.span
+                    className="
+                      absolute
+                      inset-0
+                      rounded-2xl
+                      bg-amber-400/20
+                    "
+                    animate={{
+                      scale: [1, 1.05, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  {/* Icon */}
+                  <Icon 
+                    className="w-6 h-6 sm:w-7 sm:h-7 text-white relative z-10"
+                    strokeWidth={2}
+                  />
+                  
+                  {/* Label */}
+                  <span className="
+                    text-xs
+                    sm:text-sm
+                    font-semibold
+                    tracking-wide
+                    uppercase
+                    text-white
+                    relative
+                    z-10
+                  ">
+                    {button.label}
+                  </span>
+                </motion.button>
+              );
+            }
+            
+            // Regular buttons
             return (
               <motion.button
                 key={button.id}
@@ -184,6 +281,21 @@ export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarPr
         isOpen={isContactSheetOpen}
         onClose={() => setIsContactSheetOpen(false)}
       />
+
+      {/* RSVP Sheet */}
+      <RSVPSheet 
+        isOpen={isRSVPSheetOpen}
+        onClose={() => setIsRSVPSheetOpen(false)}
+      />
+
+      {/* Location Sheet */}
+      <LocationSheet 
+        isOpen={isLocationOpen}
+        onClose={() => setIsLocationOpen(false)}
+      />
+      
+      {/* Calendar Sheet */}
+      <CalendarSheet isOpen={isCalendarOpen} onClose={closeCalendar} />
     </>
   );
 }

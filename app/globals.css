@@ -23,13 +23,48 @@
   }
 
   /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-}
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      /* Firefox */
+      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    }
+  
+    /* Chrome, Edge, Safari */
+    .scroll-minimal::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    .scroll-minimal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  
+    .scroll-minimal::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.25);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+  
+    /* REMOVE arrows completely */
+    .scroll-minimal::-webkit-scrollbar-button {
+      display: none;
+    }
+    }
 
 @layer utilities {
-  /* Custom utilities for wedding theme */
+  .font-playfair {
+    font-family: var(--font-playfair), serif;
+  }
+
+  .font-greatvibes {
+    font-family: var(--font-greatvibes), cursive;
+  }
+
+  .font-montserrat {
+    font-family: var(--font-montserrat), sans-serif;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

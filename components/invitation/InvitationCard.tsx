@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import InvitationContent from './InvitationContent';
+import CoverPage from './CoverPage';
 
 /**
  * InvitationCard Component
@@ -37,18 +38,23 @@ export default function InvitationCard() {
         max-w-2xl
         mx-auto
         bg-gradient-to-br from-cream-50 to-amber-50/30
-        rounded-2xl
+        rounded-2xl md:rounded-2xl
+        sm:rounded-none
         shadow-[0_8px_30px_rgb(139,92,46,0.12)]
         border border-amber-100/50
+        sm:border-0
         overflow-hidden
+        aspect-[4/5]
+        h-[100dvh] max-h-[100dvh]
+        sm:h-auto sm:max-h-none
       "
     >
       {/* Subtle texture overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj48cGF0aCBkPSJNMCAwaDE2djE2SDB6IiBmaWxsPSJub25lIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDMiLz48L3N2Zz4=')] opacity-40 pointer-events-none"></div>
       
       {/* Card content with elegant padding */}
-      <div className="relative px-6 py-12 sm:px-10 sm:py-16 md:px-14 md:py-20">
-        <InvitationContent />
+      <div className="relative h-full w-full">
+        <CoverPage />
       </div>
 
       {/* Decorative corner accents */}

@@ -1,224 +1,205 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Play, Pause } from 'lucide-react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Play, Pause } from 'lucide-react'
+import Image from 'next/image'
 
 interface MusicPlayerProps {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  isPlaying: boolean;
-  onPlayPause: () => void;
+  audioRef: React.RefObject<HTMLAudioElement>
+  isPlaying: boolean
+  onPlayPause: () => void
 }
 
 /**
  * MusicPlayer Component
- * 
- * Displays a vintage vinyl record player with album cover.
- * Instagram-style circular design with rotating animation.
+ *
+ * Themed vinyl player (soft wedding aesthetic).
+ * Keeps existing logic, refined UI to match the invitation theme.
  */
 export default function MusicPlayer({ audioRef, isPlaying, onPlayPause }: MusicPlayerProps) {
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
 
-  // Update time
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const audio = audioRef.current
+    if (!audio) return
 
     const updateTime = () => {
-      setCurrentTime(audio.currentTime);
-      setDuration(audio.duration);
-    };
+      setCurrentTime(audio.currentTime)
+      setDuration(audio.duration)
+    }
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateTime);
+    audio.addEventListener('timeupdate', updateTime)
+    audio.addEventListener('loadedmetadata', updateTime)
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateTime);
-    };
-  }, [audioRef]);
+      audio.removeEventListener('timeupdate', updateTime)
+      audio.removeEventListener('loadedmetadata', updateTime)
+    }
+  }, [audioRef])
 
   const formatTime = (time: number) => {
-    if (isNaN(time)) return '0:00';
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+    if (isNaN(time)) return '0:00'
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="flex flex-col items-center space-y-8">
-      {/* Vinyl Record Player */}
+    <div className="flex flex-col items-center space-y-7 sm:space-y-8">
+      {/* Vinyl */}
       <div className="relative">
-        {/* Turntable base */}
-        <div className="
-          w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96
-          rounded-full
-          bg-gradient-to-br from-stone-800 via-stone-900 to-black
-          shadow-[0_20px_60px_rgba(0,0,0,0.4)]
-          flex items-center justify-center
-          relative
-        ">
-          {/* Vinyl grooves effect */}
-          <div className="absolute inset-0 rounded-full opacity-20">
-            {[...Array(12)].map((_, i) => (
+        {/* Outer ring */}
+        <div
+  className="
+    relative
+    w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96
+    rounded-full
+    bg-gradient-to-br from-stone-800 via-stone-900 to-black
+    border border-white/10
+    shadow-[0_20px_60px_rgba(0,0,0,0.35)]
+    flex items-center justify-center
+  "
+>
+          {/* Soft vignette */}
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.06)_100%)]" />
+
+          {/* Grooves (subtle) */}
+          <div className="pointer-events-none absolute inset-0 rounded-full opacity-[0.10]">
+            {[...Array(10)].map((_, i) => (
               <div
                 key={i}
-                className="absolute inset-0 rounded-full border border-white/10"
-                style={{
-                  margin: `${i * 8}px`,
-                }}
+                className="absolute inset-0 rounded-full border border-stone-700/20"
+                style={{ margin: `${i * 9}px` }}
               />
             ))}
           </div>
 
-          {/* Rotating vinyl record */}
+          {/* Rotating disc */}
           <motion.div
             animate={{ rotate: isPlaying ? 360 : 0 }}
             transition={{
-              duration: 3,
+              duration: 3.4,
               repeat: isPlaying ? Infinity : 0,
-              ease: "linear"
+              ease: 'linear',
             }}
             className="
+              relative
               w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72
               rounded-full
-              bg-black
-              shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]
+              bg-gradient-to-br from-stone-700 via-stone-800 to-stone-900
+              shadow-[inset_0_0_40px_rgba(0,0,0,0.55)]
               flex items-center justify-center
-              relative
             "
           >
-            {/* Inner label with album cover */}
-            <div className="
-              w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60
-              rounded-full
-              bg-gradient-to-br from-amber-50 to-cream-100
-              shadow-[inset_0_4px_20px_rgba(0,0,0,0.2)]
-              flex items-center justify-center
-              overflow-hidden
-              border-4 border-amber-900/20
-              relative
-            ">
-              {/* Album cover image */}
-              <div className="w-full h-full relative">
-                <Image
-                  src="/images/album-cover.jpg"
-                  alt="Album Cover"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                {/* Optional overlay for better contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-              </div>
+            {/* Inner label */}
+            <div
+              className="
+                relative
+                w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56
+                rounded-full
+                overflow-hidden
+                bg-gradient-to-br from-cream-50 to-white
+                border border-white/30
+                shadow-[inset_0_6px_18px_rgba(0,0,0,0.15)]
+              "
+            >
+              <Image
+                src="/images/album-cover.jpg"
+                alt="Album Cover"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
             </div>
 
             {/* Center hole */}
-            <div className="
-              absolute
-              w-8 h-8
-              rounded-full
-              bg-stone-900
-              shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]
-            " />
+            <div className="absolute w-7 h-7 rounded-full bg-stone-200/90 shadow-[inset_0_2px_8px_rgba(0,0,0,0.25)] border border-stone-300/60" />
           </motion.div>
 
-          {/* Tonearm (stylus) */}
+          {/* Tonearm */}
           <motion.div
-            animate={{
-              rotate: isPlaying ? -25 : -5,
-            }}
-            transition={{ duration: 0.5 }}
+            animate={{ rotate: isPlaying ? -22 : -6 }}
+            transition={{ duration: 0.45 }}
             className="
               absolute
-              top-8 right-8
+              top-8 right-10
               w-2 h-32
-              bg-gradient-to-b from-stone-400 to-stone-600
               rounded-full
-              origin-top
-              shadow-lg
-            "
-            style={{
-              transformOrigin: 'top center',
-            }}
-          >
-            {/* Needle */}
-            <div className="
-              absolute
-              -bottom-1
-              left-1/2
-              -translate-x-1/2
-              w-3 h-3
-              bg-amber-600
-              rounded-full
+              bg-gradient-to-b from-stone-300 to-stone-500
               shadow-md
-            " />
+              origin-top
+            "
+            style={{ transformOrigin: 'top center' }}
+          >
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-stone-700 shadow-sm" />
           </motion.div>
         </div>
       </div>
 
-      {/* Song Info */}
-      <div className="text-center space-y-2">
-        <h3 className="text-2xl font-serif text-amber-900">
+      {/* Song info */}
+      <div className="text-center space-y-1.5">
+        <p className="font-montserrat text-[11px] tracking-[0.22em] uppercase text-stone-500">
+          Sedang Dimainkan
+        </p>
+        <h3 className="font-playfair text-[20px] sm:text-[22px] text-stone-700">
           Malam Bulan Dipagar Bintang
         </h3>
-        <p className="text-sm text-amber-700/70">
+        <p className="font-montserrat text-[12px] tracking-wide text-stone-500">
           Tan Sri P. Ramlee
         </p>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress */}
       <div className="w-full max-w-md space-y-2">
-        <div className="w-full h-1 bg-amber-200/30 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 rounded-full bg-stone-200/60 overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-amber-700 to-amber-500"
+            className="h-full bg-gradient-to-r from-stone-600 to-stone-400"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="flex justify-between text-xs text-amber-700/60">
+
+        <div className="flex justify-between font-montserrat text-[11px] tracking-wide text-stone-500">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
-      {/* Play/Pause Control */}
+      {/* Play/Pause */}
       <div className="flex items-center justify-center">
         <motion.button
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.03 }}
           onClick={onPlayPause}
           className="
-            w-16 h-16
+            h-14 w-14 sm:h-16 sm:w-16
             rounded-full
-            bg-gradient-to-br from-amber-700 to-amber-900
-            shadow-lg
-            hover:shadow-xl
+            bg-white/75
+            border border-stone-200/70
+            shadow-sm hover:shadow-md
+            backdrop-blur
             flex items-center justify-center
-            transition-all
-            duration-200
-            focus:outline-none
-            focus:ring-2
-            focus:ring-amber-300/50
-            focus:ring-offset-2
+            transition
+            focus:outline-none focus:ring-2 focus:ring-stone-300/40
           "
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
-            <Pause className="w-6 h-6 text-white fill-white" />
+            <Pause className="w-6 h-6 text-stone-700 fill-stone-700" />
           ) : (
-            <Play className="w-6 h-6 text-white fill-white ml-1" />
+            <Play className="w-6 h-6 text-stone-700 fill-stone-700 ml-0.5" />
           )}
         </motion.button>
       </div>
 
-      {/* Decorative text */}
-      <p className="text-xs text-amber-700/50 italic text-center max-w-xs">
-        Our special song for this beautiful day
+      {/* Note */}
+      <p className="font-montserrat text-[11px] tracking-wide text-stone-500/90 text-center max-w-xs">
+        Semoga lagu ini menambah seri hari bahagia 🌿
       </p>
     </div>
-  );
+  )
 }

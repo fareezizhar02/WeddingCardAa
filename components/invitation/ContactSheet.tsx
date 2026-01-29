@@ -1,27 +1,20 @@
-'use client';
+'use client'
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, MessageCircle, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion'
+import { Phone, MessageCircle, X, Heart } from 'lucide-react'
 
 interface Contact {
-  name: string;
-  role: string;
-  phone: string;
+  name: string
+  role: string
+  phone: string
 }
 
 interface ContactSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
-/**
- * ContactSheet Component
- * 
- * Bottom sheet that slides up above the app bar showing contact information.
- * Displays name, role, and action buttons (call & WhatsApp).
- */
 export default function ContactSheet({ isOpen, onClose }: ContactSheetProps) {
-  // Contact list - customize as needed
   const contacts: Contact[] = [
     {
       name: 'En Fadzil',
@@ -33,225 +26,176 @@ export default function ContactSheet({ isOpen, onClose }: ContactSheetProps) {
       role: 'Ibu',
       phone: '+60132080146',
     },
-  ];
+  ]
 
   const handleCall = (phone: string) => {
-    window.location.href = `tel:${phone}`;
-  };
+    window.location.href = `tel:${phone}`
+  }
 
   const handleWhatsApp = (phone: string) => {
-    // Remove '+' and format for WhatsApp
-    const whatsappNumber = phone.replace(/\+/g, '');
-    window.open(`https://wa.me/${whatsappNumber}`, '_blank');
-  };
+    const whatsappNumber = phone.replace(/\+/g, '')
+    window.open(`https://wa.me/${whatsappNumber}`, '_blank')
+  }
 
-  // Animation variants
   const sheetVariants = {
-    hidden: { 
-      y: '100%',
-      opacity: 0,
-    },
-    visible: { 
+    hidden: { y: '100%', opacity: 0 },
+    visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
-      }
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
     },
-    exit: { 
+    exit: {
       y: '100%',
       opacity: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1],
-      }
-    }
-  };
+      transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+    },
+  }
 
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
-    exit: { opacity: 0 }
-  };
+    exit: { opacity: 0 },
+  }
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - click to close */}
+          {/* Backdrop */}
           <motion.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             onClick={onClose}
-            className="
-              fixed
-              inset-0
-              bg-black/20
-              backdrop-blur-[2px]
-              z-40
-            "
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
           />
 
-          {/* Contact Sheet */}
+          {/* Sheet */}
           <motion.div
             variants={sheetVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="
-              fixed
-              bottom-16
-              sm:bottom-20
-              left-0
-              right-0
-              z-50
-              px-4
-              pb-2
-            "
+            className="fixed bottom-16 sm:bottom-20 left-0 right-0 z-50 px-4 pb-2"
           >
-            <div className="
-              max-w-2xl
-              mx-auto
-              bg-white
-              rounded-t-3xl
-              shadow-[0_-8px_30px_rgba(139,92,46,0.15)]
-              border-t
-              border-x
-              border-amber-100/50
-              overflow-hidden
-            ">
+            <div
+              className="
+                max-w-2xl mx-auto
+                rounded-t-3xl overflow-hidden
+                bg-white/80 backdrop-blur
+                border-t border-x border-stone-200/60
+                shadow-[0_-10px_40px_rgba(0,0,0,0.12)]
+              "
+            >
               {/* Header */}
-              <div className="
-                flex
-                items-center
-                justify-between
-                px-6
-                py-4
-                border-b
-                border-amber-100/30
-                bg-gradient-to-r
-                from-amber-50/50
-                to-cream-50
-              ">
-                <h3 className="text-lg font-serif text-amber-900">
-                  Hubungi Kami
-                </h3>
+              <div
+                className="
+                  flex items-center justify-between
+                  px-6 py-4
+                  border-b border-stone-200/60
+                  bg-gradient-to-r from-cream-50/80 via-white to-cream-100/60
+                "
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-white/70 border border-stone-200/60 flex items-center justify-center">
+                    <Heart className="h-4 w-4 text-stone-600" />
+                  </div>
+                  <div>
+                    <p className="font-montserrat text-[11px] tracking-[0.22em] uppercase text-stone-500">
+                      Hubungi
+                    </p>
+                    <h3 className="font-playfair text-[18px] sm:text-[20px] text-stone-700">
+                      Wakil Keluarga
+                    </h3>
+                  </div>
+                </div>
+
                 <button
                   onClick={onClose}
-                  className="
-                    p-2
-                    rounded-full
-                    hover:bg-amber-100/50
-                    transition-colors
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-amber-300/50
-                  "
+                  className="p-2 rounded-full hover:bg-stone-100/70 transition focus:outline-none focus:ring-2 focus:ring-stone-300/40"
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5 text-amber-700" strokeWidth={2} />
+                  <X className="w-5 h-5 text-stone-500" strokeWidth={2} />
                 </button>
               </div>
 
               {/* Contact List */}
-              <div className="
-                max-h-[60vh]
-                overflow-y-auto
-                divide-y
-                divide-amber-100/30
-              ">
+              <div className="max-h-[60vh] overflow-y-auto divide-y divide-stone-200/50">
                 {contacts.map((contact, index) => (
                   <div
                     key={index}
                     className="
-                      flex
-                      items-center
-                      justify-between
-                      px-6
-                      py-5
-                      hover:bg-amber-50/30
+                      flex items-center justify-between
+                      px-6 py-5
                       transition-colors
-                      duration-200
+                      hover:bg-stone-50/60
                     "
                   >
-                    {/* Contact Info */}
-                    <div className="flex-1">
-                      <h4 className="text-base font-medium text-amber-900">
+                    {/* Info */}
+                    <div>
+                      <p className="font-playfair text-[16px] text-stone-700">
                         {contact.name}
-                      </h4>
-                      <p className="text-sm text-amber-700/60 mt-0.5">
+                      </p>
+                      <p className="font-montserrat text-[12px] tracking-[0.12em] uppercase text-stone-500 mt-0.5">
                         {contact.role}
                       </p>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
-                      {/* Call Button */}
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      {/* Call */}
                       <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.05 }}
                         onClick={() => handleCall(contact.phone)}
                         className="
-                          w-11
-                          h-11
-                          rounded-full
-                          bg-gradient-to-br
-                          from-green-50
-                          to-green-100
-                          flex
-                          items-center
-                          justify-center
-                          shadow-sm
-                          hover:shadow-md
-                          transition-shadow
-                          focus:outline-none
-                          focus:ring-2
-                          focus:ring-green-300/50
-                          focus:ring-offset-2
+                          h-10 w-10 rounded-full
+                          bg-white/80
+                          border border-stone-200/60
+                          flex items-center justify-center
+                          shadow-sm hover:shadow-md
+                          transition
+                          focus:outline-none focus:ring-2 focus:ring-stone-300/40
                         "
                         aria-label={`Call ${contact.name}`}
                       >
-                        <Phone className="w-5 h-5 text-green-700" strokeWidth={2} />
+                        <Phone className="h-4 w-4 text-stone-600" />
                       </motion.button>
 
-                      {/* WhatsApp Button */}
+                      {/* WhatsApp */}
                       <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.05 }}
                         onClick={() => handleWhatsApp(contact.phone)}
                         className="
-                          w-11
-                          h-11
-                          rounded-full
-                          bg-gradient-to-br
-                          from-emerald-50
-                          to-emerald-100
-                          flex
-                          items-center
-                          justify-center
-                          shadow-sm
-                          hover:shadow-md
-                          transition-shadow
-                          focus:outline-none
-                          focus:ring-2
-                          focus:ring-emerald-300/50
-                          focus:ring-offset-2
+                          h-10 w-10 rounded-full
+                          bg-white/80
+                          border border-stone-200/60
+                          flex items-center justify-center
+                          shadow-sm hover:shadow-md
+                          transition
+                          focus:outline-none focus:ring-2 focus:ring-stone-300/40
                         "
                         aria-label={`WhatsApp ${contact.name}`}
                       >
-                        <MessageCircle className="w-5 h-5 text-emerald-700" strokeWidth={2} />
+                        <MessageCircle className="h-4 w-4 text-stone-600" />
                       </motion.button>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Footer hint */}
+              <div className="px-6 py-4 text-center">
+                <p className="font-montserrat text-[11px] tracking-wide text-stone-500">
+                  Sila hubungi sekiranya terdapat sebarang pertanyaan
+                </p>
               </div>
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
-  );
+  )
 }

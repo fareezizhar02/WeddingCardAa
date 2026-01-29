@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Heart } from "lucide-react";
-import { useState } from "react";
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Send, Heart } from 'lucide-react'
+import { useState } from 'react'
 
 interface RSVPSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 /**
@@ -17,120 +17,121 @@ interface RSVPSheetProps {
  */
 export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
   const [formData, setFormData] = useState({
-    nama: "",
-    kehadiran: "",
-    pax: "",
-    ucapan: "",
-  });
+    nama: '',
+    kehadiran: '',
+    pax: '',
+    ucapan: '',
+  })
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
-  // Google Form configuration - UPDATED WITH YOUR ACTUAL ENTRY IDs
+  // Google Form configuration
   const GOOGLE_FORM_ACTION =
-    "https://docs.google.com/forms/d/e/1FAIpQLSeiexeIC3EX43ECxq7laNtgFpzLVVO43UfCJ6ULPsaRElAfQA/formResponse";
+    'https://docs.google.com/forms/d/e/1FAIpQLSeiexeIC3EX43ECxq7laNtgFpzLVVO43UfCJ6ULPsaRElAfQA/formResponse'
   const ENTRY_IDS = {
-    nama: "entry.1348222147",
-    kehadiran: "entry.1204336256",
-    pax: "entry.1892659575",
-    ucapan: "entry.702050704",
-  };
+    nama: 'entry.1348222147',
+    kehadiran: 'entry.1204336256',
+    pax: 'entry.1892659575',
+    ucapan: 'entry.702050704',
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus("idle");
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
 
     try {
-      // Create form data for Google Form
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append(ENTRY_IDS.nama, formData.nama);
-      formDataToSubmit.append(ENTRY_IDS.kehadiran, formData.kehadiran);
-      formDataToSubmit.append(ENTRY_IDS.pax, formData.pax);
-      formDataToSubmit.append(ENTRY_IDS.ucapan, formData.ucapan);
+      const formDataToSubmit = new FormData()
+      formDataToSubmit.append(ENTRY_IDS.nama, formData.nama)
+      formDataToSubmit.append(ENTRY_IDS.kehadiran, formData.kehadiran)
+      formDataToSubmit.append(ENTRY_IDS.pax, formData.pax)
+      formDataToSubmit.append(ENTRY_IDS.ucapan, formData.ucapan)
 
-      // Submit to Google Form
       await fetch(GOOGLE_FORM_ACTION, {
-        method: "POST",
+        method: 'POST',
         body: formDataToSubmit,
-        mode: "no-cors", // Required for Google Forms
-      });
+        mode: 'no-cors',
+      })
 
-      // Success - Google Forms will always return opaque response with no-cors
-      setSubmitStatus("success");
+      setSubmitStatus('success')
 
-      // Reset form after 2 seconds
       setTimeout(() => {
         setFormData({
-          nama: "",
-          kehadiran: "",
-          pax: "",
-          ucapan: "",
-        });
-        setSubmitStatus("idle");
-        onClose();
-      }, 2000);
+          nama: '',
+          kehadiran: '',
+          pax: '',
+          ucapan: '',
+        })
+        setSubmitStatus('idle')
+        onClose()
+      }, 2000)
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitStatus("error");
+      console.error('Error submitting form:', error)
+      setSubmitStatus('error')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
-    // If kehadiran is set to HADIR and pax is empty, set it to 1
-    if (name === "kehadiran" && value === "HADIR") {
+    if (name === 'kehadiran' && value === 'HADIR') {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        pax: prev.pax || "1", // Set default to 1 if empty
-      }));
+        pax: prev.pax || '1',
+      }))
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-      }));
+      }))
     }
-  };
+  }
 
   // Animation variants
   const sheetVariants = {
-    hidden: {
-      y: "100%",
-      opacity: 0,
-    },
+    hidden: { y: '100%', opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
-      },
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
     },
     exit: {
-      y: "100%",
+      y: '100%',
       opacity: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1],
-      },
+      transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
     },
-  };
+  }
 
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
     exit: { opacity: 0 },
-  };
+  }
+
+  // Shared classes (theme-consistent)
+  const labelCls =
+    'block font-montserrat text-[12px] sm:text-[13px] tracking-[0.18em] uppercase text-stone-600 mb-2'
+  const inputCls = `
+    w-full
+    px-4 py-3
+    rounded-2xl
+    border border-stone-200/80
+    bg-white/60
+    text-stone-800
+    placeholder:text-stone-400
+    outline-none
+    transition-all
+    focus:bg-white/80
+    focus:border-stone-300
+    focus:ring-2
+    focus:ring-stone-300/35
+  `
 
   return (
     <AnimatePresence>
@@ -144,11 +145,9 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
             exit="exit"
             onClick={onClose}
             className="
-              fixed
-              inset-0
+              fixed inset-0 z-40
               bg-black/20
               backdrop-blur-[2px]
-              z-40
             "
           />
 
@@ -160,84 +159,71 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
             exit="exit"
             className="
               fixed
-              bottom-16
-              sm:bottom-20
-              left-0
-              right-0
+              bottom-16 sm:bottom-20
+              left-0 right-0
               z-50
-              px-4
-              pb-2
+              px-4 pb-2
             "
           >
             <div
               className="
-              max-w-2xl
-              mx-auto
-              bg-white
-              rounded-t-3xl
-              shadow-[0_-8px_30px_rgba(139,92,46,0.15)]
-              border-t
-              border-x
-              border-amber-100/50
-              overflow-hidden
-            "
+                max-w-2xl mx-auto
+                rounded-t-3xl
+                overflow-hidden
+                border-t border-x border-stone-200/70
+                bg-white/75
+                backdrop-blur
+                shadow-[0_-10px_40px_rgba(0,0,0,0.10)]
+              "
             >
               {/* Header */}
               <div
                 className="
-                flex
-                items-center
-                justify-between
-                px-6
-                py-4
-                border-b
-                border-amber-100/30
-                bg-gradient-to-r
-                from-amber-50/50
-                to-cream-50
-              "
+                  relative
+                  flex items-center justify-between
+                  px-6 py-4
+                  border-b border-stone-200/70
+                  bg-gradient-to-r
+                  from-cream-50/80
+                  via-white
+                  to-cream-100/60
+                "
               >
                 <div className="flex items-center gap-2">
-                  <Heart
-                    className="w-5 h-5 text-amber-700"
-                    fill="currentColor"
-                  />
-                  <h3 className="text-lg font-serif text-amber-900">RSVP</h3>
+                  <Heart className="h-5 w-5 text-stone-500" />
+                  <div className="text-left">
+                    <p className="font-montserrat text-[11px] tracking-[0.22em] uppercase text-stone-500">
+                      Maklumat Kehadiran
+                    </p>
+                    <h3 className="font-playfair text-[18px] sm:text-[20px] text-stone-700">
+                      RSVP
+                    </h3>
+                  </div>
                 </div>
+
                 <button
                   onClick={onClose}
                   className="
-                    p-2
-                    rounded-full
-                    hover:bg-amber-100/50
+                    p-2 rounded-full
+                    hover:bg-stone-100/70
                     transition-colors
                     focus:outline-none
                     focus:ring-2
-                    focus:ring-amber-300/50
+                    focus:ring-stone-300/40
                   "
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5 text-amber-700" strokeWidth={2} />
+                  <X className="h-5 w-5 text-stone-500" strokeWidth={2} />
                 </button>
               </div>
 
               {/* Form Content */}
-              <div
-                className="
-                max-h-[70vh]
-                overflow-y-auto
-                px-6
-                py-6
-              "
-              >
+              <div className="scroll-minimal max-h-[70vh] overflow-y-auto px-6 py-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Nama */}
                   <div>
-                    <label
-                      htmlFor="nama"
-                      className="block text-sm font-medium text-amber-900 mb-2"
-                    >
-                      Nama <span className="text-red-500">*</span>
+                    <label htmlFor="nama" className={labelCls}>
+                      Nama <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -246,34 +232,15 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       value={formData.nama}
                       onChange={handleChange}
                       required
-                      className="
-                        w-full
-                        px-4
-                        py-3
-                        rounded-xl
-                        border
-                        border-amber-200/50
-                        bg-amber-50/30
-                        focus:bg-white
-                        focus:border-amber-300
-                        focus:ring-2
-                        focus:ring-amber-200/50
-                        outline-none
-                        transition-all
-                        text-amber-900
-                        placeholder:text-amber-400
-                      "
+                      className={inputCls}
                       placeholder="Nama penuh anda"
                     />
                   </div>
 
                   {/* Kehadiran */}
                   <div>
-                    <label
-                      htmlFor="kehadiran"
-                      className="block text-sm font-medium text-amber-900 mb-2"
-                    >
-                      Kehadiran <span className="text-red-500">*</span>
+                    <label htmlFor="kehadiran" className={labelCls}>
+                      Kehadiran <span className="text-rose-600">*</span>
                     </label>
                     <select
                       id="kehadiran"
@@ -281,22 +248,7 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       value={formData.kehadiran}
                       onChange={handleChange}
                       required
-                      className="
-                        w-full
-                        px-4
-                        py-3
-                        rounded-xl
-                        border
-                        border-amber-200/50
-                        bg-amber-50/30
-                        focus:bg-white
-                        focus:border-amber-300
-                        focus:ring-2
-                        focus:ring-amber-200/50
-                        outline-none
-                        transition-all
-                        text-amber-900
-                      "
+                      className={inputCls}
                     >
                       <option value="">Pilih kehadiran</option>
                       <option value="HADIR">Hadir</option>
@@ -311,50 +263,116 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
                     >
-                      <label
-                        htmlFor="pax"
-                        className="block text-sm font-medium text-amber-900 mb-2"
-                      >
-                        Bilangan Pax <span className="text-red-500">*</span>
+                      <label htmlFor="pax" className={labelCls}>
+                        Bilangan Pax <span className="text-rose-600">*</span>
                       </label>
-                      <input
-                        type="number"
-                        id="pax"
-                        name="pax"
-                        value={formData.pax || "1"}
-                        onChange={handleChange}
-                        onKeyDown={(e) => e.preventDefault()}
-                        required={formData.kehadiran === "HADIR"}
-                        min="1"
-                        className="
-        w-full
-        px-4
-        py-3
-        rounded-xl
-        border
-        border-amber-200/50
-        bg-amber-50/30
-        focus:bg-white
-        focus:border-amber-300
-        focus:ring-2
-        focus:ring-amber-200/50
-        outline-none
-        transition-all
-        text-amber-900
-        [appearance:textfield]
-        [&::-webkit-outer-spin-button]:appearance-auto
-        [&::-webkit-inner-spin-button]:appearance-auto
-      "
-                      />
+
+                      {/* Custom number input with visible buttons */}
+                      <div className="flex items-center gap-3">
+                        {/* Decrease Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentPax = parseInt(
+                              formData.pax || "1",
+                              10,
+                            );
+                            if (currentPax > 1) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                pax: (currentPax - 1).toString(),
+                              }));
+                            }
+                          }}
+                          className="
+                            flex-shrink-0
+                            w-12 h-12
+                            rounded-xl
+                            border border-stone-300
+                            bg-white
+                            hover:bg-stone-50
+                            active:bg-stone-100
+                            transition-colors
+                            flex items-center justify-center
+                            text-stone-700
+                            font-semibold
+                            text-xl
+                            disabled:opacity-40
+                            disabled:cursor-not-allowed
+                          "
+                          disabled={parseInt(formData.pax || "1", 10) <= 1}
+                          aria-label="Decrease pax"
+                        >
+                          −
+                        </button>
+
+                        {/* Number Display/Input */}
+                        <input
+                          type="number"
+                          id="pax"
+                          name="pax"
+                          value={formData.pax || "1"}
+                          onChange={handleChange}
+                          required
+                          min="1"
+                          max="99"
+                          readOnly
+                          className={`
+                            ${inputCls}
+                            flex-1
+                            text-center
+                            font-semibold
+                            text-2xl
+                            cursor-default
+                            [appearance:textfield]
+                            [&::-webkit-outer-spin-button]:appearance-none
+                            [&::-webkit-inner-spin-button]:appearance-none
+                          `}
+                        />
+
+                        {/* Increase Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentPax = parseInt(
+                              formData.pax || "1",
+                              10,
+                            );
+                            if (currentPax < 99) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                pax: (currentPax + 1).toString(),
+                              }));
+                            }
+                          }}
+                          className="
+          flex-shrink-0
+          w-12 h-12
+          rounded-xl
+          border border-stone-300
+          bg-white
+          hover:bg-stone-50
+          active:bg-stone-100
+          transition-colors
+          flex items-center justify-center
+          text-stone-700
+          font-semibold
+          text-xl
+          disabled:opacity-40
+          disabled:cursor-not-allowed
+        "
+                          disabled={parseInt(formData.pax || "1", 10) >= 99}
+                          aria-label="Increase pax"
+                        >
+                          +
+                        </button>
+                      </div>
                     </motion.div>
                   )}
 
                   {/* Ucapan */}
                   <div>
-                    <label
-                      htmlFor="ucapan"
-                      className="block text-sm font-medium text-amber-900 mb-2"
-                    >
+                    <label htmlFor="ucapan" className={labelCls}>
                       Ucapan Kepada Pengantin
                     </label>
                     <textarea
@@ -363,24 +381,7 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       value={formData.ucapan}
                       onChange={handleChange}
                       rows={4}
-                      className="
-                        w-full
-                        px-4
-                        py-3
-                        rounded-xl
-                        border
-                        border-amber-200/50
-                        bg-amber-50/30
-                        focus:bg-white
-                        focus:border-amber-300
-                        focus:ring-2
-                        focus:ring-amber-200/50
-                        outline-none
-                        transition-all
-                        text-amber-900
-                        placeholder:text-amber-400
-                        resize-none
-                      "
+                      className={`${inputCls} resize-none`}
                       placeholder="Tulis ucapan anda di sini..."
                     />
                   </div>
@@ -393,24 +394,24 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                     className="
                       w-full
                       py-3.5
-                      rounded-xl
+                      rounded-2xl
                       bg-gradient-to-r
-                      from-amber-600
-                      to-amber-700
+                      from-stone-700
+                      to-stone-800
                       text-white
+                      font-montserrat
+                      text-[13px] sm:text-[14px]
                       font-medium
+                      tracking-[0.10em]
                       shadow-lg
-                      shadow-amber-500/25
+                      shadow-stone-600/20
                       hover:shadow-xl
-                      hover:shadow-amber-500/30
+                      hover:shadow-stone-600/25
                       disabled:opacity-60
                       disabled:cursor-not-allowed
                       transition-all
                       duration-200
-                      flex
-                      items-center
-                      justify-center
-                      gap-2
+                      flex items-center justify-center gap-2
                     "
                   >
                     {isSubmitting ? (
@@ -422,18 +423,18 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                             repeat: Infinity,
                             ease: "linear",
                           }}
-                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          className="h-5 w-5 border-2 border-white/90 border-t-transparent rounded-full"
                         />
                         Menghantar...
                       </>
                     ) : submitStatus === "success" ? (
                       <>
-                        <Heart className="w-5 h-5" fill="currentColor" />
+                        <Heart className="h-5 w-5" fill="currentColor" />
                         Terima Kasih!
                       </>
                     ) : (
                       <>
-                        <Send className="w-5 h-5" />
+                        <Send className="h-5 w-5" />
                         Hantar RSVP
                       </>
                     )}
@@ -445,17 +446,16 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="
+                        rounded-2xl
+                        border border-emerald-200/70
+                        bg-emerald-50/70
                         p-4
-                        rounded-xl
-                        bg-green-50
-                        border
-                        border-green-200
-                        text-green-800
                         text-center
-                        text-sm
                       "
                     >
-                      RSVP anda telah berjaya dihantar! 🎉
+                      <p className="font-montserrat text-[13px] sm:text-[14px] text-emerald-800">
+                        RSVP anda telah berjaya dihantar! 🎉
+                      </p>
                     </motion.div>
                   )}
 
@@ -465,17 +465,16 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="
+                        rounded-2xl
+                        border border-rose-200/70
+                        bg-rose-50/70
                         p-4
-                        rounded-xl
-                        bg-red-50
-                        border
-                        border-red-200
-                        text-red-800
                         text-center
-                        text-sm
                       "
                     >
-                      Maaf, terdapat masalah. Sila cuba lagi.
+                      <p className="font-montserrat text-[13px] sm:text-[14px] text-rose-800">
+                        Maaf, terdapat masalah. Sila cuba lagi.
+                      </p>
                     </motion.div>
                   )}
                 </form>
