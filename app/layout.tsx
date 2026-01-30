@@ -22,14 +22,14 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
 });
 
-export const playfair = Playfair_Display({
+const playfair = Playfair_Display({
   subsets: ['latin'],
   weight: ['400', '600'],
   variable: '--font-playfair',
   display: 'swap',
 })
 
-export const greatVibes = Great_Vibes({
+const greatVibes = Great_Vibes({
   subsets: ['latin'],
   weight: ['400'],
   variable: '--font-greatvibes',
@@ -39,8 +39,13 @@ export const greatVibes = Great_Vibes({
 export const metadata: Metadata = {
   title: 'Fareez & Zanis - Wedding Invitation',
   description: 'You are cordially invited to celebrate the wedding of Fareez and Zanis',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 };
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export default function RootLayout({
   children,
