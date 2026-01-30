@@ -108,7 +108,7 @@ export default function MusicPlayer({ audioRef, isPlaying, onPlayPause }: MusicP
               "
             >
               <Image
-                src="/images/album-cover.jpg"
+                src="/images/Izanis.jpeg"
                 alt="Album Cover"
                 fill
                 className="object-cover"
@@ -147,10 +147,10 @@ export default function MusicPlayer({ audioRef, isPlaying, onPlayPause }: MusicP
           Sedang Dimainkan
         </p>
         <h3 className="font-playfair text-[20px] sm:text-[22px] text-stone-700">
-          Malam Bulan Dipagar Bintang
+          Kota Ini Tak Sama Tanpamu
         </h3>
         <p className="font-montserrat text-[12px] tracking-wide text-stone-500">
-          Tan Sri P. Ramlee
+          Nadhif Basalamah, Aziz Harun & Aishah Retno
         </p>
       </div>
 

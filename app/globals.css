@@ -17,40 +17,70 @@
     --amber-900: 88 58 30;
   }
 
+  /* ✅ Ensure proper scrolling on mobile */
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    /* ✅ iOS smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* ✅ Force scroll calculation */
+    overflow-y: scroll;
+    height: auto;
+    min-height: 100%;
+  }
+
   body {
     @apply bg-cream-100 text-amber-900;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* ✅ Ensure body can scroll on mobile */
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
   }
 
-  /* Smooth scrolling */
-    html {
-      scroll-behavior: smooth;
-      scrollbar-width: thin;
-      /* Firefox */
-      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-    }
-  
-    /* Chrome, Edge, Safari */
-    .scroll-minimal::-webkit-scrollbar {
-      width: 6px;
-    }
-  
-    .scroll-minimal::-webkit-scrollbar-track {
-      background: transparent;
-    }
-  
-    .scroll-minimal::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.25);
-      border-radius: 999px;
-      border: 2px solid transparent;
-      background-clip: content-box;
-    }
-  
-    /* REMOVE arrows completely */
-    .scroll-minimal::-webkit-scrollbar-button {
-      display: none;
-    }
-    }
+  /* Chrome, Edge, Safari */
+  html::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  /* REMOVE arrows completely */
+  html::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /* For elements with scroll-minimal class */
+  .scroll-minimal::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scroll-minimal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-minimal::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scroll-minimal::-webkit-scrollbar-button {
+    display: none;
+  }
+}
 
 @layer utilities {
   .font-playfair {

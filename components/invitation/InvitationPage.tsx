@@ -9,13 +9,14 @@ import BottomAppBar from "./BottomAppBar";
 import EntranceScreen from "./EntranceScreen";
 import FloatingMuteButton from "./FloatingMuteButton";
 import ContentCard from "./ContentCard";
+import SparkleLayer from "./SparkleLayer";
 
 type PageType = "cover" | "music";
 
 /**
- * InvitationPage WITHOUT PageTransition
- *
- * Testing if PageTransition is causing the height issue
+ * InvitationPage Component
+ * 
+ * Main page with auto-scroll functionality optimized for mobile devices.
  */
 export default function InvitationPage() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -32,10 +33,14 @@ export default function InvitationPage() {
   const scrollAnimationRef = useRef<number | null>(null);
   const isAutoScrollActiveRef = useRef(true);
   const currentPageRef = useRef<PageType>("cover");
+  const retryCountRef = useRef(0);
 
   const AUTO_SCROLL_CONFIG = {
     initialDelay: 3000, // Wait 3 seconds before starting
-    continuousScrollSpeed: 1.5, // Scroll speed in pixels per frame
+    continuousScrollSpeed: window.innerWidth < 768 ? 5 : 2, // Scroll speed in pixels per frame
+    maxRetries: 5, // Maximum retries for layout detection
+    retryDelay: 500, // Delay between retries
+    minScrollableHeight: 100, // Minimum scrollable height required
   };
 
   const handleEnter = async () => {
@@ -44,7 +49,14 @@ export default function InvitationPage() {
 
     setHasEntered(true);
     console.log("🎬 User entered");
+    
+    // Ensure scrolling is enabled
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
+    document.documentElement.style.height = "auto";
+    document.body.style.height = "auto";
 
+    // Start audio
     if (audioRef.current) {
       try {
         audioRef.current.currentTime = 138;
@@ -56,27 +68,76 @@ export default function InvitationPage() {
       }
     }
 
+    // Show scroll control after 1 second
     setTimeout(() => {
       setShowScrollControl(true);
     }, 1000);
 
+    // Start auto-scroll with improved layout detection
     autoScrollTimeoutRef.current = setTimeout(() => {
-      console.log(
-        "Document height after delay:",
-        document.documentElement.scrollHeight,
-      );
-      if (isAutoScrollActiveRef.current) {
-        startAutoScroll();
-      }
+      checkLayoutAndStartScroll();
     }, AUTO_SCROLL_CONFIG.initialDelay);
+  };
+
+  /**
+   * Check if layout is settled and start auto-scroll
+   * Retries if scrollable area is not detected (mobile fix)
+   */
+  const checkLayoutAndStartScroll = () => {
+    const el = (document.scrollingElement || document.documentElement) as HTMLElement;
+const scrollHeight = el.scrollHeight;
+const windowHeight = el.clientHeight || window.innerHeight;
+const hasScrollableArea =
+  scrollHeight > windowHeight + AUTO_SCROLL_CONFIG.minScrollableHeight;
+    
+    console.log('📏 Layout check:', {
+      bodyScrollHeight: document.body.scrollHeight, // ok
+htmlScrollHeight: document.documentElement.scrollHeight, // ok
+elScrollHeight: el.scrollHeight, // tambah
+elClientHeight: el.clientHeight, // tambah
+    });
+    
+    if (hasScrollableArea && isAutoScrollActiveRef.current) {
+      console.log('✅ Layout settled, starting auto-scroll');
+      retryCountRef.current = 0; // Reset retry count
+      startAutoScroll();
+    } else if (!hasScrollableArea && retryCountRef.current < AUTO_SCROLL_CONFIG.maxRetries) {
+      retryCountRef.current++;
+      console.warn(`⚠️ No scrollable area detected, retrying (${retryCountRef.current}/${AUTO_SCROLL_CONFIG.maxRetries})...`);
+      
+      // Wait for next animation frame and retry
+      requestAnimationFrame(() => {
+        setTimeout(checkLayoutAndStartScroll, AUTO_SCROLL_CONFIG.retryDelay);
+      });
+    } else if (retryCountRef.current >= AUTO_SCROLL_CONFIG.maxRetries) {
+      console.error('❌ Failed to detect scrollable area after max retries');
+      retryCountRef.current = 0;
+    }
   };
 
   const startAutoScroll = () => {
     console.log("🚀 Starting auto-scroll");
-    console.log("Document height:", document.documentElement.scrollHeight);
-    console.log("Window height:", window.innerHeight);
 
-    // ✅ prevent double RAF loop
+    // Get scroll container (try multiple options for mobile compatibility)
+    const scrollingElement = document.scrollingElement as HTMLElement | null;
+    const fallbackElement = document.documentElement;
+    const scrollContainer = scrollingElement || fallbackElement;
+
+    // Log comprehensive debugging info
+    console.log({
+      scrollingElement: scrollContainer.tagName,
+      scrollHeight: scrollContainer.scrollHeight,
+      clientHeight: scrollContainer.clientHeight,
+      innerHeight: window.innerHeight,
+      maxScroll: scrollContainer.scrollHeight - window.innerHeight,
+      bodyOverflow: getComputedStyle(document.body).overflow,
+      htmlOverflow: getComputedStyle(document.documentElement).overflow,
+      bodyHeight: document.body.scrollHeight,
+      htmlHeight: document.documentElement.scrollHeight,
+      visualViewport: window.visualViewport?.height,
+    });
+
+    // ✅ Prevent double RAF loop
     if (scrollAnimationRef.current) {
       cancelAnimationFrame(scrollAnimationRef.current);
       scrollAnimationRef.current = null;
@@ -85,14 +146,14 @@ export default function InvitationPage() {
     let frameCount = 0;
 
     const scroll = () => {
-      // ✅ read from refs (no stale state)
+      // ✅ Read from refs (no stale state)
       if (!isAutoScrollActiveRef.current) {
         console.log("⏹️ Auto-scroll stopped (ref)");
         scrollAnimationRef.current = null;
         return;
       }
 
-      // ✅ stop auto-scroll if not on cover page
+      // ✅ Stop auto-scroll if not on cover page
       if (currentPageRef.current !== "cover") {
         console.log("⏹️ Auto-scroll stopped (page changed)");
         isAutoScrollActiveRef.current = false;
@@ -101,43 +162,65 @@ export default function InvitationPage() {
         return;
       }
 
-      const maxScroll =
-        Math.max(
-          document.body.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.clientHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight,
-        ) - window.innerHeight;
+      // Get current scroll container (re-check each frame for mobile)
+      const el = (document.scrollingElement || document.documentElement) as HTMLElement;
 
-      // ✅ guard: no scrollable area
-      if (maxScroll <= 0) {
-        console.log("⚠️ No scrollable area");
+      if (!el) {
+        console.log("⚠️ No scrollingElement");
         isAutoScrollActiveRef.current = false;
         setIsAutoScrollActive(false);
         scrollAnimationRef.current = null;
         return;
       }
 
-      const currentScroll = window.scrollY;
-      frameCount++;
+      const maxScroll =
+  Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) -
+  window.innerHeight;
 
-      if (frameCount % 60 === 0) {
-        console.log(
-          `📍 ${currentScroll.toFixed(0)}/${maxScroll.toFixed(0)}px (${(
-            (currentScroll / maxScroll) *
-            100
-          ).toFixed(1)}%)`,
-        );
+
+      // ✅ Guard: no scrollable area
+      if (maxScroll <= 0) {
+        console.log("⚠️ No scrollable area (maxScroll:", maxScroll, ")");
+        isAutoScrollActiveRef.current = false;
+        setIsAutoScrollActive(false);
+        scrollAnimationRef.current = null;
+        return;
       }
 
+      const currentScroll =
+  window.scrollY ||
+  document.documentElement.scrollTop ||
+  document.body.scrollTop ||
+  0;
+      frameCount++;
+
+      // Log progress every 60 frames (~1 second at 60fps)
+      if (frameCount % 60 === 0) {
+  console.log("tops:", {
+    html: document.documentElement.scrollTop,
+    body: document.body.scrollTop,
+    win: window.scrollY,
+  });
+}
+
+      // Continue scrolling if not at bottom
       if (currentScroll < maxScroll - 5) {
-        window.scrollBy(0, AUTO_SCROLL_CONFIG.continuousScrollSpeed);
+        const nextScrollPos = Math.min(
+          currentScroll + AUTO_SCROLL_CONFIG.continuousScrollSpeed,
+          maxScroll
+        );
+        
+        // ✅ Use scrollTo for better mobile compatibility
+        // ✅ force scroll on all possible containers (mobile safe)
+document.documentElement.scrollTop = nextScrollPos;
+document.body.scrollTop = nextScrollPos; // iOS fallback
+window.scrollTo(0, nextScrollPos);
+        
         scrollAnimationRef.current = requestAnimationFrame(scroll);
       } else {
         console.log("🏁 Reached bottom");
         isAutoScrollActiveRef.current = false;
-        setIsAutoScrollActive(false); // ✅ indicator akan hilang + button jadi Play
+        setIsAutoScrollActive(false);
         scrollAnimationRef.current = null;
       }
     };
@@ -145,11 +228,9 @@ export default function InvitationPage() {
     scrollAnimationRef.current = requestAnimationFrame(scroll);
   };
 
-  // Remove startSlowScroll - we don't need it anymore!
-
   const stopAutoScroll = () => {
-    console.log("⏸️ Stopped");
-    isAutoScrollActiveRef.current = false; // ✅ immediate stop for RAF loop
+    console.log("⏸️ Auto-scroll stopped");
+    isAutoScrollActiveRef.current = false; // ✅ Immediate stop for RAF loop
     setIsAutoScrollActive(false);
 
     if (scrollAnimationRef.current) {
@@ -159,10 +240,13 @@ export default function InvitationPage() {
   };
 
   const resumeAutoScroll = () => {
-    console.log("▶️ Resumed");
-    isAutoScrollActiveRef.current = true; // ✅ immediate
+    console.log("▶️ Auto-scroll resumed");
+    isAutoScrollActiveRef.current = true; // ✅ Immediate
     setIsAutoScrollActive(true);
-    startAutoScroll();
+    
+    // Re-check layout before resuming (in case page height changed)
+    retryCountRef.current = 0;
+    checkLayoutAndStartScroll();
   };
 
   const toggleAutoScroll = () => {
@@ -179,6 +263,7 @@ export default function InvitationPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Monitor scroll position for showing "scroll to top" button
   useEffect(() => {
     const handleScroll = () => {
       const scrollPos = window.scrollY;
@@ -189,6 +274,7 @@ export default function InvitationPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Sync refs with state
   useEffect(() => {
     isAutoScrollActiveRef.current = isAutoScrollActive;
   }, [isAutoScrollActive]);
@@ -197,6 +283,7 @@ export default function InvitationPage() {
     currentPageRef.current = currentPage;
   }, [currentPage]);
 
+  // Stop auto-scroll when leaving cover page
   useEffect(() => {
     if (currentPage !== "cover") {
       stopAutoScroll();
@@ -204,24 +291,42 @@ export default function InvitationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
+  // Handle user interaction to stop auto-scroll
   useEffect(() => {
     if (!hasEntered) return;
 
     const handleUserInteraction = (type: string) => {
       if (isAutoScrollActiveRef.current) {
-        console.log(`👤 User ${type}`);
+        console.log(`👤 User interaction: ${type}`);
         stopAutoScroll();
       }
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > 5) {
-        isAutoScrollActiveRef.current = false; // instant kill
+      // Only stop if user makes a deliberate scroll (not accidental micro-movements)
+      if (Math.abs(e.deltaY) > 10) {
+        isAutoScrollActiveRef.current = false; // Instant kill
         handleUserInteraction("wheel");
       }
     };
 
-    const handleTouch = () => handleUserInteraction("touch");
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0]?.clientY ?? 0;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0]?.clientY ?? 0;
+      const deltaY = Math.abs(y - touchStartY);
+
+      // ✅ Only stop on deliberate swipe (increased threshold for mobile)
+      if (deltaY > 30) { // Increased from 12 to 30
+        console.log('👆 User swiped:', deltaY, 'px');
+        handleUserInteraction("touch");
+      }
+    };
+
     const handleKey = (e: KeyboardEvent) => {
       if (
         [
@@ -234,27 +339,32 @@ export default function InvitationPage() {
           " ",
         ].includes(e.key)
       ) {
-        handleUserInteraction(`key`);
+        handleUserInteraction(`keyboard: ${e.key}`);
       }
     };
 
     window.addEventListener("wheel", handleWheel, { passive: true });
-    window.addEventListener("touchmove", handleTouch, { passive: true });
     window.addEventListener("keydown", handleKey);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchmove", handleTouch);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("keydown", handleKey);
     };
-  }, [hasEntered, isAutoScrollActive]);
+  }, [hasEntered]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (autoScrollTimeoutRef.current)
+      if (autoScrollTimeoutRef.current) {
         clearTimeout(autoScrollTimeoutRef.current);
-      if (scrollAnimationRef.current)
+      }
+      if (scrollAnimationRef.current) {
         cancelAnimationFrame(scrollAnimationRef.current);
+      }
     };
   }, []);
 
@@ -290,12 +400,12 @@ export default function InvitationPage() {
       </AnimatePresence>
 
       {/* Fixed Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,239,231,0.8),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(251,243,228,0.6),transparent_50%)]"></div>
-        <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')]"></div>
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,239,231,0.8),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(251,243,228,0.6),transparent_50%)]" />
+        <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')]" />
       </div>
 
-      {/* NO PageTransition wrapper - direct rendering */}
+      {/* Page Content */}
       <div className="relative">
         {currentPage === "cover" && (
           <motion.div
@@ -382,38 +492,45 @@ export default function InvitationPage() {
             exit={{ opacity: 0, scale: 0 }}
             onClick={scrollToTop}
             className="fixed top-6 left-4 sm:left-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-white to-cream-50 hover:from-amber-50 hover:to-cream-100 shadow-lg flex items-center justify-center border border-amber-200/50"
+            aria-label="Scroll to top"
           >
             <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6 text-amber-800" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Auto-Scroll Control */}
-      {hasEntered &&
-        showScrollControl &&
-        currentPage === "cover" &&
-        !showScrollToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={toggleAutoScroll}
-            className="fixed bottom-24 left-4 sm:bottom-28 sm:left-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-white to-cream-50 hover:from-amber-50 hover:to-cream-100 shadow-lg flex items-center justify-center border border-amber-200/50"
-          >
-            {isAutoScrollActive ? (
-              <Pause
-                className="w-6 h-6 sm:w-7 sm:h-7 text-amber-800"
-                fill="currentColor"
-              />
-            ) : (
-              <Play
-                className="w-6 h-6 sm:w-7 sm:h-7 text-amber-800 ml-0.5"
-                fill="currentColor"
-              />
-            )}
-          </motion.button>
-        )}
+      {/* Auto-Scroll Control Button */}
+      <AnimatePresence>
+        {hasEntered &&
+          showScrollControl &&
+          currentPage === "cover" &&
+          !showScrollToTop && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              onClick={toggleAutoScroll}
+              className="fixed bottom-24 left-4 sm:bottom-28 sm:left-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-white to-cream-50 hover:from-amber-50 hover:to-cream-100 shadow-lg flex items-center justify-center border border-amber-200/50 transition-all"
+              aria-label={
+                isAutoScrollActive ? "Pause auto-scroll" : "Resume auto-scroll"
+              }
+            >
+              {isAutoScrollActive ? (
+                <Pause
+                  className="w-6 h-6 sm:w-7 sm:h-7 text-amber-800"
+                  fill="currentColor"
+                />
+              ) : (
+                <Play
+                  className="w-6 h-6 sm:w-7 sm:h-7 text-amber-800 ml-0.5"
+                  fill="currentColor"
+                />
+              )}
+            </motion.button>
+          )}
+      </AnimatePresence>
 
-      {/* Auto-scroll indicator */}
+      {/* Auto-scroll Indicator */}
       <AnimatePresence>
         {isAutoScrollActive &&
           showScrollControl &&
@@ -440,6 +557,9 @@ export default function InvitationPage() {
       {hasEntered && (
         <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />
       )}
+
+      {/* ✨ Sparkle Layer (di atas background, bawah content) */}
+      <SparkleLayer />
     </div>
   );
 }
