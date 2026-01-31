@@ -17,10 +17,10 @@ export default function CalendarSheet({ isOpen, onClose }: CalendarSheetProps) {
   const timezone = 'Asia/Kuala_Lumpur'
 
   // Google Calendar (UTC)
-  const googleStartUTC = '20260328T040000Z'
-  const googleEndUTC = '20260328T100000Z'
+  const googleStartUTC = '20260418T040000Z'
+  const googleEndUTC = '20260418T100000Z'
 
-  const displayDate = 'Sabtu, 28 Mac 2026'
+  const displayDate = 'Sabtu, 18 April 2026'
   const displayTime = '12:00 PM - 6:00 PM'
 
   const openGoogleCalendar = () => {
@@ -48,8 +48,8 @@ export default function CalendarSheet({ isOpen, onClose }: CalendarSheetProps) {
       `SUMMARY:${escapeICS(title)}`,
       `DESCRIPTION:${escapeICS(description)}`,
       `LOCATION:${escapeICS(location)}`,
-      `DTSTART;TZID=${timezone}:20260328T120000`,
-      `DTEND;TZID=${timezone}:20260328T180000`,
+      `DTSTART;TZID=${timezone}:20260418T120000`,
+      `DTEND;TZID=${timezone}:20260418T180000`,
       'STATUS:CONFIRMED',
       'SEQUENCE:0',
       'END:VEVENT',

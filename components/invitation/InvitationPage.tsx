@@ -342,7 +342,7 @@ export default function InvitationPage() {
             <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
               <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
                 Direka Oleh <br />
-                <span className="font-semibold text-stone-700">Fareez Izhar</span>
+                <span className="font-semibold text-stone-700">FareeZanis</span>
               </p>
             </div>
 
