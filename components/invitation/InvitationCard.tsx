@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import InvitationContent from './InvitationContent';
 import CoverPage from './CoverPage';
 
 /**

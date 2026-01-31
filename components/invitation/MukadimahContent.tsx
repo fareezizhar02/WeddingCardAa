@@ -41,13 +41,13 @@ export default function MukadimahContent() {
           variants={itemVariants}
           className="font-montserrat text-[14px] sm:text-[15px] tracking-[0.06em] text-stone-600"
         >
-          Assalamualaikum dan salam Sejahtera
+          Assalamualaikum dan Salam Sejahtera
         </motion.p>
 
         {/* Parents Names */}
         <motion.div variants={itemVariants} className="space-y-2 pt-2">
           <p className="font-playfair text-[18px] sm:text-[20px] text-stone-700">
-            Mohad Fadzil Bin Ahmad Taib
+            Mohd Fadzil Bin Ahmad Taib
           </p>
 
           <p className="font-montserrat text-[16px] font-medium tracking-widest text-stone-500">
