@@ -79,7 +79,7 @@ export default function AturCaraContent() {
                   Majlis Bermula
                 </p>
                 <p className="font-playfair text-[20px] text-amber-900">
-                  12.00 pm
+                  11.00 am
                 </p>
               </div>
 
@@ -88,7 +88,7 @@ export default function AturCaraContent() {
                   Majlis Tamat
                 </p>
                 <p className="font-playfair text-[20px] text-amber-900">
-                  5.00 pm
+                  4.00 pm
                 </p>
               </div>
             </motion.div>

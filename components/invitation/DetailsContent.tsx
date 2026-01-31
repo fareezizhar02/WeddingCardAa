@@ -60,7 +60,7 @@ export default function DetailsContent() {
         {/* Masa */}
         <motion.div variants={itemVariants} className="space-y-2">
           <p className={labelCls}>Masa</p>
-          <p className={valueCls}>12.00 PM - 5.00 PM</p>
+          <p className={valueCls}>11.00 am - 4.00 pm</p>
         </motion.div>
 
         {/* Small divider */}

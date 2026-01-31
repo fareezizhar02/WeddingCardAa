@@ -239,7 +239,7 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
                       onChange={handleChange}
                       required
                       className={inputCls}
-                      placeholder="Nama penuh anda"
+                      placeholder="Nama anda"
                     />
                   </div>
 

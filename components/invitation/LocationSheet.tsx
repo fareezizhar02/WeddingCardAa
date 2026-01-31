@@ -165,7 +165,7 @@ Seksyen 12, Bandar Tasik Senangin,
                 </div>
 
                 <p className="text-center font-montserrat text-[12px] leading-relaxed text-stone-500">
-                  Tip: Waze biasanya lebih laju untuk trafik semasa, Google Maps lebih detail untuk peta kawasan.
+                  Tip: Gunakan Google Maps untuk navigasi yang lebih tepat.
                 </p>
               </div>
             </div>
