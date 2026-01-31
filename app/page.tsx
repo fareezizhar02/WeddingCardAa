@@ -1,3 +1,5 @@
+'use client';
+
 import InvitationPage from '@/components/invitation/InvitationPage';
 
 /**
