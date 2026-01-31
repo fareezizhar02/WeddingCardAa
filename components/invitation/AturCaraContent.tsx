@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
+import { motion } from "framer-motion";
 
 /**
  * AturCaraContent Component
@@ -17,7 +17,7 @@ export default function AturCaraContent() {
         delayChildren: 0.2,
       },
     },
-  }
+  };
 
   const itemVariants = {
     initial: { opacity: 0, y: 12 },
@@ -29,7 +29,7 @@ export default function AturCaraContent() {
         ease: [0.22, 1, 0.36, 1],
       },
     },
-  }
+  };
 
   return (
     <div className="relative w-full bg-transparent">
@@ -73,10 +73,7 @@ export default function AturCaraContent() {
             </motion.div>
 
             {/* Schedule */}
-            <motion.div
-              variants={itemVariants}
-              className="space-y-4"
-            >
+            <motion.div variants={itemVariants} className="space-y-4">
               <div className="flex flex-col items-center gap-1">
                 <p className="font-montserrat text-[13px] tracking-[0.2em] uppercase text-amber-700/70">
                   Majlis Bermula
@@ -91,7 +88,7 @@ export default function AturCaraContent() {
                   Majlis Tamat
                 </p>
                 <p className="font-playfair text-[20px] text-amber-900">
-                  6.00 pm
+                  5.00 pm
                 </p>
               </div>
             </motion.div>
@@ -99,5 +96,5 @@ export default function AturCaraContent() {
         </motion.div>
       </motion.div>
     </div>
-  )
+  );
 }

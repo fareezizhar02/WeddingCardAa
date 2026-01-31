@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import ResponseContent from '../invitation/ResponseContent';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import ResponseContent from "../invitation/ResponseContent";
 
 type RSVPResponse = {
   nama?: string | null;
@@ -14,7 +14,8 @@ type RSVPResponse = {
   createdAt?: string | number | null;
 };
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmIa6Bone9v3m_YgqrQ3zkkqPutYA3n0p_zWemHU6a6H5Y2LFfPn9jQLWS1-ypmizrsQ/exec';
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwmIa6Bone9v3m_YgqrQ3zkkqPutYA3n0p_zWemHU6a6H5Y2LFfPn9jQLWS1-ypmizrsQ/exec";
 
 export default function ResponsesPageClient() {
   const router = useRouter();
@@ -25,19 +26,19 @@ export default function ResponsesPageClient() {
   const fetchResponses = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const res = await fetch(APPS_SCRIPT_URL);
       const json = await res.json();
-      
+
       if (json.success) {
         setResponses(json.data);
       } else {
-        setError('Failed to load responses');
+        setError("Failed to load responses");
       }
     } catch (err) {
-      console.error('Error fetching responses:', err);
-      setError('Unable to connect to server');
+      console.error("Error fetching responses:", err);
+      setError("Unable to connect to server");
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +49,8 @@ export default function ResponsesPageClient() {
   }, []);
 
   return (
-    <div className="
+    <div
+      className="
       min-h-screen
       bg-gradient-to-br
       from-cream-100
@@ -60,7 +62,8 @@ export default function ResponsesPageClient() {
       sm:px-6
       sm:py-12
       sm:pb-32
-    ">
+    "
+    >
       {/* Header */}
       <div className="max-w-2xl mx-auto mb-8">
         <div className="flex items-center justify-between">
@@ -69,7 +72,7 @@ export default function ResponsesPageClient() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="
               flex items-center gap-2
               px-4 py-2
@@ -110,7 +113,9 @@ export default function ResponsesPageClient() {
               disabled:opacity-50
             "
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+            />
             Refresh
           </motion.button>
         </div>
@@ -150,7 +155,7 @@ export default function ResponsesPageClient() {
         )}
 
         {!isLoading && !error && (
-          <ResponseContent responses={responses} />
+          <ResponseContent responses={responses} showKehadiran />
         )}
       </div>
     </div>

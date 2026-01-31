@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Heart } from 'lucide-react'
-import { useState } from 'react'
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Send, Heart } from "lucide-react";
+import { useState } from "react";
 
 interface RSVPSheetProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 /**
@@ -17,106 +17,112 @@ interface RSVPSheetProps {
  */
 export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
   const [formData, setFormData] = useState({
-    nama: '',
-    kehadiran: '',
-    pax: '',
-    ucapan: '',
-  })
+    nama: "",
+    kehadiran: "",
+    pax: "",
+    ucapan: "",
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   // Google Form configuration
   const GOOGLE_FORM_ACTION =
-    'https://docs.google.com/forms/d/e/1FAIpQLSeiexeIC3EX43ECxq7laNtgFpzLVVO43UfCJ6ULPsaRElAfQA/formResponse'
+    "https://docs.google.com/forms/d/e/1FAIpQLSeiexeIC3EX43ECxq7laNtgFpzLVVO43UfCJ6ULPsaRElAfQA/formResponse";
   const ENTRY_IDS = {
-    nama: 'entry.1348222147',
-    kehadiran: 'entry.1204336256',
-    pax: 'entry.1892659575',
-    ucapan: 'entry.702050704',
-  }
+    nama: "entry.1348222147",
+    kehadiran: "entry.1204336256",
+    pax: "entry.1892659575",
+    ucapan: "entry.702050704",
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus('idle')
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
 
     try {
-      const formDataToSubmit = new FormData()
-      formDataToSubmit.append(ENTRY_IDS.nama, formData.nama)
-      formDataToSubmit.append(ENTRY_IDS.kehadiran, formData.kehadiran)
-      formDataToSubmit.append(ENTRY_IDS.pax, formData.pax)
-      formDataToSubmit.append(ENTRY_IDS.ucapan, formData.ucapan)
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append(ENTRY_IDS.nama, formData.nama);
+      formDataToSubmit.append(ENTRY_IDS.kehadiran, formData.kehadiran);
+      formDataToSubmit.append(ENTRY_IDS.pax, formData.pax);
+      formDataToSubmit.append(ENTRY_IDS.ucapan, formData.ucapan);
 
       await fetch(GOOGLE_FORM_ACTION, {
-        method: 'POST',
+        method: "POST",
         body: formDataToSubmit,
-        mode: 'no-cors',
-      })
+        mode: "no-cors",
+      });
 
-      setSubmitStatus('success')
+      window.dispatchEvent(new Event("rsvp:submitted"));
+
+      setSubmitStatus("success");
 
       setTimeout(() => {
         setFormData({
-          nama: '',
-          kehadiran: '',
-          pax: '',
-          ucapan: '',
-        })
-        setSubmitStatus('idle')
-        onClose()
-      }, 2000)
+          nama: "",
+          kehadiran: "",
+          pax: "",
+          ucapan: "",
+        });
+        setSubmitStatus("idle");
+        onClose();
+      }, 2000);
     } catch (error) {
-      console.error('Error submitting form:', error)
-      setSubmitStatus('error')
+      console.error("Error submitting form:", error);
+      setSubmitStatus("error");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
-    if (name === 'kehadiran' && value === 'HADIR') {
+    if (name === "kehadiran" && value === "HADIR") {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        pax: prev.pax || '1',
-      }))
+        pax: prev.pax || "1",
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-      }))
+      }));
     }
-  }
+  };
 
   // Animation variants
   const sheetVariants = {
-    hidden: { y: '100%', opacity: 0 },
+    hidden: { y: "100%", opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
     },
     exit: {
-      y: '100%',
+      y: "100%",
       opacity: 0,
       transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
     },
-  }
+  };
 
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
     exit: { opacity: 0 },
-  }
+  };
 
   // Shared classes (theme-consistent)
   const labelCls =
-    'block font-montserrat text-[12px] sm:text-[13px] tracking-[0.18em] uppercase text-stone-600 mb-2'
+    "block font-montserrat text-[12px] sm:text-[13px] tracking-[0.18em] uppercase text-stone-600 mb-2";
   const inputCls = `
     w-full
     px-4 py-3
@@ -131,7 +137,7 @@ export default function RSVPSheet({ isOpen, onClose }: RSVPSheetProps) {
     focus:border-stone-300
     focus:ring-2
     focus:ring-stone-300/35
-  `
+  `;
 
   return (
     <AnimatePresence>
