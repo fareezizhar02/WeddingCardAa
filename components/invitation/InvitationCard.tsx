@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import CoverPage from './CoverPage';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * InvitationCard Component
@@ -55,6 +56,58 @@ export default function InvitationCard() {
       <div className="relative h-full w-full">
         <CoverPage />
       </div>
+
+      {/* Scroll Indicator */}
+{/* <motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 5.8, duration: 0.8 }}
+  className="
+    absolute
+    inset-x-0
+    flex
+    justify-center
+    z-30
+    pointer-events-none
+  "
+  style={{
+    // ✅ naikkan dari bawah supaya tak kena BottomAppBar
+    bottom: "calc(env(safe-area-inset-bottom) + 96px)",
+  }}
+>
+  <motion.div
+    animate={{ y: [0, 10, 0] }}
+    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+    className="
+      flex flex-col items-center
+      px-4 py-2
+      rounded-full
+      bg-white/55
+      backdrop-blur-md
+      border border-white/40
+      shadow-[0_10px_25px_rgba(0,0,0,0.10)]
+      text-stone-700
+    "
+  >
+    <span className="text-[11px] tracking-[0.32em] uppercase mb-1">
+      Scroll
+    </span>
+
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </motion.div>
+</motion.div> */}
+
 
       {/* Decorative corner accents */}
       <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-amber-200/40 rounded-tl-2xl"></div>

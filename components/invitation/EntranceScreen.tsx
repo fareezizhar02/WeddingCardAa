@@ -55,26 +55,36 @@ export default function EntranceScreen({ onEnter }: EntranceScreenProps) {
 
   // Stamp animation
   const stampVariants = {
-    initial: {
-      scale: 1,
-      opacity: 1,
+  initial: {
+    scale: 1,
+    opacity: 1,
+  },
+  pulse: {
+    scale: [1, 1.06, 1],
+    transition: {
+      duration: 1.6,
+      ease: "easeInOut",
+      repeat: Infinity,
+      repeatType: "mirror" as const,
     },
-    clicked: {
-      scale: 0.85,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut",
-      },
+  },
+  clicked: {
+    scale: 0.85,
+    transition: {
+      duration: 0.2,
+      ease: "easeOut",
     },
-    opening: {
-      scale: 0.85,
-      opacity: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeInOut",
-      },
+  },
+  opening: {
+    scale: 0.85,
+    opacity: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeInOut",
     },
-  };
+  },
+};
+
 
   // Seam line animation
   const seamVariants = {
@@ -106,6 +116,8 @@ export default function EntranceScreen({ onEnter }: EntranceScreenProps) {
       },
     },
   };
+
+  
 
   return (
     <AnimatePresence>
@@ -222,53 +234,58 @@ export default function EntranceScreen({ onEnter }: EntranceScreenProps) {
 
           {/* Red Wax Stamp Button - Centered on Screen */}
           <motion.button
-            variants={stampVariants}
-            initial="initial"
-            whileTap={!opening ? "clicked" : undefined}
-            animate={opening ? "opening" : "initial"}
-            onClick={handleStampClick}
-            disabled={opening}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 focus:outline-none focus:ring-4 focus:ring-amber-400/50 rounded-full disabled:cursor-not-allowed"
-            aria-label="Open invitation"
-            style={{
-              filter: "drop-shadow(0 8px 16px rgba(139, 69, 19, 0.3))",
-              marginLeft: '-70px',
-              marginTop: '-70px',
-            }}
-          >
-            <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-              <Image
-                src="/images/redstamp.png"
-                alt="Wax Seal"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </motion.button>
+  variants={stampVariants}
+  initial="initial"
+  whileTap={!opening ? "clicked" : undefined}
+  animate={opening ? "opening" : "pulse"}   // 👈 ni
+  onClick={handleStampClick}
+  disabled={opening}
+  className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 focus:outline-none focus:ring-4 focus:ring-amber-400/50 rounded-full disabled:cursor-not-allowed"
+  aria-label="Open invitation"
+  style={{
+    filter: "drop-shadow(0 8px 16px rgba(139, 69, 19, 0.3))",
+    marginLeft: "-70px",
+    marginTop: "-70px",
+  }}
+>
+  <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+    <Image
+      src="/images/redstamp.png"
+      alt="Wax Seal"
+      fill
+      className="object-contain"
+      priority
+    />
+  </div>
+</motion.button>
 
-          {/* Optional Subtle Hint Text */}
-          {!opening && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="
-                absolute
-                bottom-8
-                left-1/2
-                -translate-x-1/2
-                text-xs
-                text-[#8B7355]/60
-                italic
-                text-center
-                z-30
-                px-4
-              "
-            >
-              Tap the seal to open
-            </motion.p>
-          )}
+          {/* Hint Text - Raised Up */}
+{!opening && (
+  <motion.p
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 0.5, duration: 0.8 }}
+    className={`
+      absolute
+      min-[390px]:bottom-72
+      min-[375px]:bottom-48
+      sm:bottom-44
+      bottom-44
+      left-1/2
+      -translate-x-1/2
+      text-sm
+      sm:text-base
+      font-normal
+      text-[#3c22018c]
+      text-center
+      z-30
+      px-6
+      font-montserrat
+    `}
+  >
+    Sila tekan cop untuk buka jemputan
+  </motion.p>
+)}
         </div>
       </motion.div>
     </AnimatePresence>

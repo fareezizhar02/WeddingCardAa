@@ -148,10 +148,10 @@ export default function CoverPage() {
               ease: [0.22, 1, 0.36, 1],
             }}
             className={`${greatVibes.className} text-stone-600 min-[390px]:text-[24px]`}
-  style={{
-    fontSize: 'clamp(17px, 4.5vw, 21px)', // base <390
-    marginTop: 'clamp(14px, 3.5vw, 22px)',
-  }}
+            style={{
+              fontSize: "clamp(17px, 4.5vw, 21px)", // base <390
+              marginTop: "clamp(14px, 3.5vw, 22px)",
+            }}
           >
             #SatuSyafDibelakangFareez
           </motion.p>

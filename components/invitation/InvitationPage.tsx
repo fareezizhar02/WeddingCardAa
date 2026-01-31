@@ -27,6 +27,35 @@ export default function InvitationPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageType>("cover");
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+useEffect(() => {
+  if (!hasEntered || currentPage !== "cover") return;
+
+  const getScrollY = () => {
+    const el = document.scrollingElement || document.documentElement;
+    return el.scrollTop || 0;
+  };
+
+  const onScroll = () => {
+    const y = getScrollY();
+    setShowScrollHint(y < 40);
+  };
+
+  // Bagi dia show dulu, then evaluate lepas layout settle
+  setShowScrollHint(true);
+
+  const raf = requestAnimationFrame(() => {
+    onScroll();
+  });
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  return () => {
+    cancelAnimationFrame(raf);
+    window.removeEventListener("scroll", onScroll);
+  };
+}, [hasEntered, currentPage]);
+
 
   /**
    * =========================
@@ -303,7 +332,7 @@ export default function InvitationPage() {
   };
 
   return (
-    <div className="relative w-full overflow-x-hidden">
+    <div className="relative w-full overflow-x-hidden isolate">
       <audio ref={audioRef} loop preload="auto">
         <source src="/music/MusicBackground.mp3" type="audio/mpeg" />
       </audio>
@@ -371,6 +400,49 @@ export default function InvitationPage() {
 
       {hasEntered && <FloatingMuteButton audioRef={audioRef} />}
       {hasEntered && <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />}
+
+      {hasEntered && currentPage === "cover" && showScrollHint && (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ delay: 2.2, duration: 0.6 }}
+    className="fixed inset-x-0 z-[60] flex justify-center pointer-events-none"
+    style={{
+      bottom: "calc(env(safe-area-inset-bottom) + 96px)", // ✅ adjust ikut tinggi BottomAppBar
+    }}
+  >
+    <motion.div
+      animate={{ y: [0, 10, 0] }}
+      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+      className="
+        flex flex-col items-center
+        px-4 py-2
+        rounded-full
+        bg-white/55
+        backdrop-blur-md
+        border border-white/40
+        shadow-[0_10px_25px_rgba(0,0,0,0.10)]
+        text-stone-700
+      "
+    >
+      <span className="text-[11px] tracking-[0.32em] uppercase mb-1">Scroll</span>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </motion.div>
+  </motion.div>
+)}
+
 
       {/* ✨ Sparkle Layer */}
       <SparkleLayer />
