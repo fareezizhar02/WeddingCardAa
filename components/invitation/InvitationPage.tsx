@@ -369,16 +369,6 @@ export default function InvitationPage() {
         )}
       </div>
 
-      /**
-       * Auto-scroll UI (Scroll-to-top, Pause/Play, Indicator) — DISABLED
-       *
-       * When you want to re-enable later, uncomment:
-       * - icons import
-       * - states: isAutoScrollActive/showScrollControl/showScrollToTop
-       * - handlers + effects
-       * - UI blocks
-       */
-
       {hasEntered && <FloatingMuteButton audioRef={audioRef} />}
       {hasEntered && <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />}
 
