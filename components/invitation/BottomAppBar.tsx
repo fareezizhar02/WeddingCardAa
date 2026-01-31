@@ -9,6 +9,7 @@ import CalendarSheet from './CalendarSheet';
 import LocationSheet from './LocationSheet';
 
 type PageType = 'cover' | 'music';
+type Panel = 'contact' | 'rsvp' | 'calendar' | 'location' | null;
 
 interface BottomAppBarProps {
   currentPage?: PageType;
@@ -28,6 +29,52 @@ export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarPr
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [isLocationOpen, setIsLocationOpen] = useState(false)
 
+  const closeOthers = (keep: Panel) => {
+  if (keep !== 'contact') setIsContactSheetOpen(false);
+  if (keep !== 'rsvp') setIsRSVPSheetOpen(false);
+  if (keep !== 'calendar') setIsCalendarOpen(false);
+  if (keep !== 'location') setIsLocationOpen(false);
+};
+
+  const toggleContact = () => {
+  setIsContactSheetOpen((open) => {
+    const next = !open;
+    closeOthers(next ? 'contact' : null);
+    return next;
+  });
+};
+
+const toggleRSVP = () => {
+  setIsRSVPSheetOpen((open) => {
+    const next = !open;
+    closeOthers(next ? 'rsvp' : null);
+    return next;
+  });
+};
+
+const toggleCalendar = () => {
+  setIsCalendarOpen((open) => {
+    const next = !open;
+    closeOthers(next ? 'calendar' : null);
+    return next;
+  });
+};
+
+const toggleLocation = () => {
+  setIsLocationOpen((open) => {
+    const next = !open;
+    closeOthers(next ? 'location' : null);
+    return next;
+  });
+};
+
+
+  const toggleMusic = () => {
+  if (!onNavigate) return;
+  closeOthers(null);
+  onNavigate(currentPage === 'music' ? 'cover' : 'music');
+};
+
   const closeCalendar = () => setIsCalendarOpen(false)
 
   // Button configuration - RSVP in the center
@@ -36,33 +83,37 @@ export default function BottomAppBar({ currentPage, onNavigate }: BottomAppBarPr
       id: 'contact',
       label: 'Hubungi',
       icon: Phone,
-      onClick: () => setIsContactSheetOpen(true),
+      onClick: toggleContact,
+      isActive: isContactSheetOpen, // optional (kalau nak nampak active)
     },
     {
       id: 'music',
       label: 'Muzik',
       icon: Music,
-      onClick: () => onNavigate?.('music'),
+      onClick: toggleMusic,
       isActive: currentPage === 'music',
     },
     {
       id: 'rsvp',
       label: 'RSVP',
       icon: Mail,
-      onClick: () => setIsRSVPSheetOpen(true),
+      onClick: toggleRSVP,
       isCenter: true,
+      // isActive: isRSVPSheetOpen, // optional (tapi center button styling tak guna isActive)
     },
     {
       id: 'calendar',
       label: 'Kalendar',
       icon: Calendar,
-      onClick: () => setIsCalendarOpen(true),
+      onClick: toggleCalendar,
+      isActive: isCalendarOpen, // optional
     },
     {
       id: 'location',
       label: 'Lokasi',
       icon: MapPin,
-      onClick: () => setIsLocationOpen(true),
+      onClick: toggleLocation,
+      isActive: isLocationOpen, // optional
     },
   ];
 

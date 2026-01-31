@@ -131,13 +131,12 @@ export default function ResponseContent({ responses: externalResponses, appsScri
   return (
     <motion.div variants={containerVariants} initial="initial" animate="animate" className="w-full">
       <div className="w-full space-y-6 sm:space-y-7 text-center">
-        <motion.div variants={itemVariants}>
+        {/* <motion.div variants={itemVariants}>
           <Kehadiran responses={responses} />
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="flex items-center justify-center py-1">
+        </motion.div> */}
+        {/* <motion.div variants={itemVariants} className="flex items-center justify-center py-1">
           <div className="h-px w-full max-w-[360px] bg-gradient-to-r from-transparent via-stone-300/70 to-transparent" />
-        </motion.div>
+        </motion.div> */}
 
         <motion.div variants={itemVariants}>
           <Ucapan responses={responses} />
