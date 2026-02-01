@@ -1,9 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-// Auto-scroll icons (Pause/Play/ArrowUp) not needed while auto-scroll disabled
-// import { Pause, Play, ArrowUp } from "lucide-react";
 
 import InvitationCard from "./InvitationCard";
 import MusicSection from "./MusicSection";
@@ -13,283 +11,119 @@ import FloatingMuteButton from "./FloatingMuteButton";
 import ContentCard from "./ContentCard";
 import SparkleLayer from "./SparkleLayer";
 
+import AutoScrollResumeChip from "./AutoScrollResumeChip";
+import { useAutoScrollEngine } from "./useAutoScrollEngine";
+import type { SectionRefs } from "./useAutoScrollEngine";
+
 type PageType = "cover" | "music";
 
-/**
- * InvitationPage Component
- *
- * ✅ Auto-scroll is temporarily DISABLED (commented out)
- */
 export default function InvitationPage() {
   const audioRef = useRef<HTMLAudioElement>(null);
-  // const contentCardRef = useRef<HTMLDivElement>(null); // (optional) keep if you need later
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageType>("cover");
-  const [showScrollHint, setShowScrollHint] = useState(true);
 
-useEffect(() => {
-  if (!hasEntered || currentPage !== "cover") return;
+  // ✅ Top-level refs
+  const contentTopRef = useRef<HTMLElement | null>(null);
+  const mukadimahRef = useRef<HTMLElement | null>(null);
+  const detailsRef = useRef<HTMLElement | null>(null);
+  const aturcaraRef = useRef<HTMLElement | null>(null);
+  const menghitungHariRef = useRef<HTMLElement | null>(null);
+  const doaRef = useRef<HTMLElement | null>(null);
+  const rsvpRef = useRef<HTMLElement | null>(null);
+  const rsvpCTARef = useRef<HTMLElement>(null);
+  const responsesRef = useRef<HTMLElement | null>(null);
 
-  const getScrollY = () => {
-    const el = document.scrollingElement || document.documentElement;
-    return el.scrollTop || 0;
-  };
+  const sectionRefs: SectionRefs = useMemo(
+    () => ({
+      contentTop: contentTopRef,
+      mukadimah: mukadimahRef,
+      details: detailsRef,
+      aturcara: aturcaraRef,
+      menghitungHari: menghitungHariRef,
+      doa: doaRef,
+      rsvp: rsvpRef,
+      rsvpCTA: rsvpCTARef,
+      responses: responsesRef,
+    }),
+    []
+  );
 
-  const onScroll = () => {
-    const y = getScrollY();
-    setShowScrollHint(y < 40);
-  };
+  const engineEnabled = hasEntered && currentPage === "cover";
 
-  // Bagi dia show dulu, then evaluate lepas layout settle
-  setShowScrollHint(true);
-
-  const raf = requestAnimationFrame(() => {
-    onScroll();
+  const autoScroll = useAutoScrollEngine({
+    enabled: engineEnabled,
+    sectionRefs,
+    startDelayMs: 5500,
+    resumeChipDelayMs: 2000,
   });
 
-  window.addEventListener("scroll", onScroll, { passive: true });
-  return () => {
-    cancelAnimationFrame(raf);
-    window.removeEventListener("scroll", onScroll);
-  };
-}, [hasEntered, currentPage]);
-
-
   /**
-   * =========================
-   * AUTO SCROLL — DISABLED
-   * =========================
-   *
-   * Everything related to auto-scroll is commented out below.
+   * ✅ Stop auto-scroll on user interaction
+   * only while engine is running (so resume tap during paused_doa won't be sabotaged)
    */
+  useEffect(() => {
+    if (!engineEnabled) return;
+    if (autoScroll.engineState !== "running") return;
 
-  // const [isAutoScrollActive, setIsAutoScrollActive] = useState(true);
-  // const [showScrollControl, setShowScrollControl] = useState(false);
-  // const [showScrollToTop, setShowScrollToTop] = useState(false);
+    const stop = () => autoScroll.stopByUser();
 
-  // const autoScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // const scrollAnimationRef = useRef<number | null>(null);
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > 6) stop();
+    };
 
-  // const isAutoScrollActiveRef = useRef(true);
-  // const currentPageRef = useRef<PageType>("cover");
-  // const retryCountRef = useRef(0);
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0]?.clientY ?? 0;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0]?.clientY ?? 0;
+      if (Math.abs(y - touchStartY) > 18) stop();
+    };
 
-  // const AUTO_SCROLL_CONFIG = useRef({
-  //   initialDelay: 3000,
-  //   continuousScrollSpeed: 3, // set later based on viewport
-  //   maxRetries: 5,
-  //   retryDelay: 500,
-  //   minScrollableHeight: 100,
-  // });
+    const onKeyDown = (e: KeyboardEvent) => {
+      const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
+      if (keys.includes(e.key)) stop();
+    };
 
-  // useEffect(() => {
-  //   const w = window.innerWidth;
-  //   AUTO_SCROLL_CONFIG.current.continuousScrollSpeed = w < 768 ? 5 : 2;
-  // }, []);
+    const onMouseDown = () => stop();
 
-  // useEffect(() => {
-  //   isAutoScrollActiveRef.current = isAutoScrollActive;
-  // }, [isAutoScrollActive]);
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
 
-  // useEffect(() => {
-  //   currentPageRef.current = currentPage;
-  // }, [currentPage]);
+      const tag = t.tagName?.toLowerCase();
+      const isInput = tag === "input" || tag === "textarea" || tag === "select";
+      if (isInput) stop();
+    };
 
-  // const stopAutoScroll = useCallback(() => {
-  //   isAutoScrollActiveRef.current = false;
-  //   setIsAutoScrollActive(false);
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("focusin", onFocusIn);
 
-  //   if (scrollAnimationRef.current) {
-  //     cancelAnimationFrame(scrollAnimationRef.current);
-  //     scrollAnimationRef.current = null;
-  //   }
-  // }, []);
-
-  // const startAutoScroll = useCallback(() => {
-  //   if (scrollAnimationRef.current) {
-  //     cancelAnimationFrame(scrollAnimationRef.current);
-  //     scrollAnimationRef.current = null;
-  //   }
-
-  //   const scroll = () => {
-  //     if (!isAutoScrollActiveRef.current) {
-  //       scrollAnimationRef.current = null;
-  //       return;
-  //     }
-
-  //     if (currentPageRef.current !== "cover") {
-  //       isAutoScrollActiveRef.current = false;
-  //       setIsAutoScrollActive(false);
-  //       scrollAnimationRef.current = null;
-  //       return;
-  //     }
-
-  //     const maxScroll =
-  //       Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) -
-  //       window.innerHeight;
-
-  //     if (maxScroll <= 0) {
-  //       isAutoScrollActiveRef.current = false;
-  //       setIsAutoScrollActive(false);
-  //       scrollAnimationRef.current = null;
-  //       return;
-  //     }
-
-  //     const currentScroll =
-  //       window.scrollY ||
-  //       document.documentElement.scrollTop ||
-  //       document.body.scrollTop ||
-  //       0;
-
-  //     if (currentScroll < maxScroll - 5) {
-  //       const nextScrollPos = Math.min(
-  //         currentScroll + AUTO_SCROLL_CONFIG.current.continuousScrollSpeed,
-  //         maxScroll
-  //       );
-
-  //       document.documentElement.scrollTop = nextScrollPos;
-  //       document.body.scrollTop = nextScrollPos;
-  //       window.scrollTo(0, nextScrollPos);
-
-  //       scrollAnimationRef.current = requestAnimationFrame(scroll);
-  //     } else {
-  //       isAutoScrollActiveRef.current = false;
-  //       setIsAutoScrollActive(false);
-  //       scrollAnimationRef.current = null;
-  //     }
-  //   };
-
-  //   scrollAnimationRef.current = requestAnimationFrame(scroll);
-  // }, []);
-
-  // const checkLayoutAndStartScroll = useCallback(() => {
-  //   const el = (document.scrollingElement || document.documentElement) as HTMLElement;
-  //   const scrollHeight = el.scrollHeight;
-  //   const windowHeight = el.clientHeight || window.innerHeight;
-
-  //   const hasScrollableArea =
-  //     scrollHeight > windowHeight + AUTO_SCROLL_CONFIG.current.minScrollableHeight;
-
-  //   if (hasScrollableArea && isAutoScrollActiveRef.current) {
-  //     retryCountRef.current = 0;
-  //     startAutoScroll();
-  //     return;
-  //   }
-
-  //   if (!hasScrollableArea && retryCountRef.current < AUTO_SCROLL_CONFIG.current.maxRetries) {
-  //     retryCountRef.current += 1;
-
-  //     requestAnimationFrame(() => {
-  //       setTimeout(checkLayoutAndStartScroll, AUTO_SCROLL_CONFIG.current.retryDelay);
-  //     });
-  //     return;
-  //   }
-
-  //   retryCountRef.current = 0;
-  // }, [startAutoScroll]);
-
-  // const resumeAutoScroll = useCallback(() => {
-  //   isAutoScrollActiveRef.current = true;
-  //   setIsAutoScrollActive(true);
-
-  //   retryCountRef.current = 0;
-  //   checkLayoutAndStartScroll();
-  // }, [checkLayoutAndStartScroll]);
-
-  // const toggleAutoScroll = () => {
-  //   if (isAutoScrollActive) stopAutoScroll();
-  //   else resumeAutoScroll();
-  // };
-
-  // const scrollToTop = () => {
-  //   stopAutoScroll();
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // };
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const scrollPos = window.scrollY || document.documentElement.scrollTop || 0;
-  //     setShowScrollToTop(scrollPos > window.innerHeight * 0.3);
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll, { passive: true });
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (currentPage !== "cover") stopAutoScroll();
-  // }, [currentPage, stopAutoScroll]);
-
-  // useEffect(() => {
-  //   if (!hasEntered) return;
-
-  //   const handleUserInteraction = () => {
-  //     if (isAutoScrollActiveRef.current) stopAutoScroll();
-  //   };
-
-  //   const handleWheel = (e: WheelEvent) => {
-  //     if (Math.abs(e.deltaY) > 10) handleUserInteraction();
-  //   };
-
-  //   let touchStartY = 0;
-
-  //   const handleTouchStart = (e: TouchEvent) => {
-  //     touchStartY = e.touches[0]?.clientY ?? 0;
-  //   };
-
-  //   const handleTouchMove = (e: TouchEvent) => {
-  //     const y = e.touches[0]?.clientY ?? 0;
-  //     const deltaY = Math.abs(y - touchStartY);
-  //     if (deltaY > 30) handleUserInteraction();
-  //   };
-
-  //   const handleKey = (e: KeyboardEvent) => {
-  //     if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(e.key)) {
-  //       handleUserInteraction();
-  //     }
-  //   };
-
-  //   window.addEventListener("wheel", handleWheel, { passive: true });
-  //   window.addEventListener("keydown", handleKey);
-  //   window.addEventListener("touchstart", handleTouchStart, { passive: true });
-  //   window.addEventListener("touchmove", handleTouchMove, { passive: true });
-
-  //   return () => {
-  //     window.removeEventListener("wheel", handleWheel);
-  //     window.removeEventListener("keydown", handleKey);
-  //     window.removeEventListener("touchstart", handleTouchStart);
-  //     window.removeEventListener("touchmove", handleTouchMove);
-  //   };
-  // }, [hasEntered, stopAutoScroll]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (autoScrollTimeoutRef.current) clearTimeout(autoScrollTimeoutRef.current);
-  //     if (scrollAnimationRef.current) cancelAnimationFrame(scrollAnimationRef.current);
-  //   };
-  // }, []);
-
-  /**
-   * =========================
-   * END AUTO SCROLL — DISABLED
-   * =========================
-   */
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("focusin", onFocusIn);
+    };
+  }, [engineEnabled, autoScroll.engineState, autoScroll.stopByUser]);
 
   const handleEnter = async () => {
-    // keep scroll top behavior (not auto-scroll)
     window.scrollTo(0, 0);
-
     setHasEntered(true);
 
-    // Ensure scrolling is enabled
     document.documentElement.style.overflow = "auto";
     document.body.style.overflow = "auto";
     document.documentElement.style.height = "auto";
     document.body.style.height = "auto";
 
-    // Start audio (may be blocked by browser until user gesture; EntranceScreen click counts)
     if (audioRef.current) {
       try {
         audioRef.current.currentTime = 138;
@@ -299,14 +133,6 @@ useEffect(() => {
         console.error("Audio play blocked:", error);
       }
     }
-
-    // Auto-scroll UI is disabled, so we don't show scroll controls
-    // setTimeout(() => setShowScrollControl(true), 1000);
-    // if (autoScrollTimeoutRef.current) clearTimeout(autoScrollTimeoutRef.current);
-    // autoScrollTimeoutRef.current = setTimeout(() => {
-    //   if (!isAutoScrollActiveRef.current) return;
-    //   checkLayoutAndStartScroll();
-    // }, AUTO_SCROLL_CONFIG.current.initialDelay);
   };
 
   const togglePlayPause = async () => {
@@ -327,6 +153,7 @@ useEffect(() => {
   };
 
   const goToCoverPage = () => {
+    autoScroll.stopByUser();
     setCurrentPage("cover");
     setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
   };
@@ -348,26 +175,15 @@ useEffect(() => {
       {/* Page Content */}
       <div className="relative">
         {currentPage === "cover" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* InvitationCard Section */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
             <div className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 md:px-8 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
               <InvitationCard />
             </div>
 
-            {/* ContentCard Section */}
-            <div
-              // ref={contentCardRef}
-              className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20"
-            >
-              <ContentCard />
+            <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
+              <ContentCard sectionRefs={sectionRefs} />
             </div>
 
-            {/* Footer / Credit */}
             <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
               <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
                 Direka Oleh <br />
@@ -375,18 +191,12 @@ useEffect(() => {
               </p>
             </div>
 
-            {/* Bottom padding for nav bar */}
             <div className="h-20 sm:h-24 bg-gradient-to-br from-cream-50 to-amber-50/20" />
           </motion.div>
         )}
 
         {currentPage === "music" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="min-h-screen px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-32 md:px-8 md:py-16 flex items-center justify-center"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-32 md:px-8 md:py-16 flex items-center justify-center">
             <MusicSection audioRef={audioRef} isPlaying={isPlaying} onPlayPause={togglePlayPause} />
             <button
               onClick={goToCoverPage}
@@ -399,52 +209,43 @@ useEffect(() => {
       </div>
 
       {hasEntered && <FloatingMuteButton audioRef={audioRef} />}
-      {hasEntered && <BottomAppBar currentPage={currentPage} onNavigate={setCurrentPage} />}
 
-      {hasEntered && currentPage === "cover" && showScrollHint && (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ delay: 2.2, duration: 0.6 }}
-    className="fixed inset-x-0 z-[60] flex justify-center pointer-events-none"
-    style={{
-      bottom: "calc(env(safe-area-inset-bottom) + 96px)", // ✅ adjust ikut tinggi BottomAppBar
-    }}
-  >
-    <motion.div
-      animate={{ y: [0, 10, 0] }}
-      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-      className="
-        flex flex-col items-center
-        px-4 py-2
-        rounded-full
-        bg-white/55
-        backdrop-blur-md
-        border border-white/40
-        shadow-[0_10px_25px_rgba(0,0,0,0.10)]
-        text-stone-700
-      "
-    >
-      <span className="text-[11px] tracking-[0.32em] uppercase mb-1">Scroll</span>
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
-    </motion.div>
-  </motion.div>
-)}
+      {hasEntered && (
+        <BottomAppBar
+          currentPage={currentPage}
+          onNavigate={(p) => {
+            autoScroll.stopByUser();
+            setCurrentPage(p);
+          }}
+        />
+      )}
 
+      {/* ✅ Auto-scroll indicator (replaces old "Scroll" hint) */}
+      {hasEntered && currentPage === "cover" && autoScroll.engineState === "running" && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 6 }}
+          transition={{ duration: 0.35 }}
+          className="fixed inset-x-0 z-[60] flex justify-center pointer-events-none"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}
+        >
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/55 backdrop-blur-md border border-white/40 shadow-[0_10px_25px_rgba(0,0,0,0.10)] text-stone-700">
+            <span className="text-[11px] tracking-[0.28em] uppercase">Auto-scroll</span>
+            <motion.span
+              aria-hidden
+              animate={{ opacity: [0.35, 1, 0.35] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              className="text-[12px] leading-none"
+            >
+              •••
+            </motion.span>
+          </div>
+        </motion.div>
+      )}
 
-      {/* ✨ Sparkle Layer */}
+      <AutoScrollResumeChip visible={autoScroll.showResumeChip} onResume={autoScroll.resumeFromDoa} />
+
       <SparkleLayer />
     </div>
   );

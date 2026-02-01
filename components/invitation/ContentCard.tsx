@@ -10,14 +10,19 @@ import RSVPContent from './RSVPContent'
 import ResponseContent from './ResponseContent'
 import AnimatedSection from './AnimatedSection'
 import AnimatedDivider from './AnimatedDivider'
+import type { SectionRefs } from './useAutoScrollEngine'
+
+type Props = {
+  sectionRefs: SectionRefs
+}
 
 /**
  * ContentCard Component
- * 
+ *
  * Main content card with scroll-triggered animations.
  * Each section animates into view as user scrolls down.
  */
-export default function ContentCard() {
+export default function ContentCard({ sectionRefs }: Props) {
   const cardVariants = {
     initial: { opacity: 0, scale: 0.95 },
     animate: {
@@ -54,52 +59,78 @@ export default function ContentCard() {
       {/* Content with scroll-triggered animations */}
       <div className="relative z-20 mx-auto flex w-full max-w-[560px] flex-col items-center px-6 py-12 text-center sm:py-16">
         <div className="w-full space-y-8 sm:space-y-10">
-          
-          {/* Mukadimah - fade up */}
-          <AnimatedSection type="fade-up">
-            <MukadimahContent />
-          </AnimatedSection>
+          {/* ✅ Stable anchor for top of ContentCard */}
+          <section
+            ref={sectionRefs.contentTop as any}
+            aria-hidden="true"
+            className="h-px w-full"
+          />
+
+          {/* Mukadimah */}
+          <section ref={sectionRefs.mukadimah as any} className="scroll-mt-24">
+            <AnimatedSection type="fade-up">
+              <MukadimahContent />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider />
 
-          {/* Details - scale for emphasis */}
-          <AnimatedSection type="scale" delay={0.5}>
-            <DetailsContent />
-          </AnimatedSection>
+          {/* Details */}
+          <section ref={sectionRefs.details as any} className="scroll-mt-24">
+            <AnimatedSection type="scale" delay={0.5}>
+              <DetailsContent />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider delay={0.1} />
 
-          {/* Atur Cara - fade up */}
-          <AnimatedSection type="fade-up" delay={0.5}>
-            <AturCaraContent />
-          </AnimatedSection>
+          {/* Atur Cara */}
+          <section ref={sectionRefs.aturcara as any} className="scroll-mt-24">
+            <AnimatedSection type="fade-up" delay={0.5}>
+              <AturCaraContent />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider delay={0.1} />
 
-          {/* Menghitung Hari - scale for special emphasis */}
-          <AnimatedSection type="scale" delay={0.5}>
-            <MenghitungHariContent />
-          </AnimatedSection>
+          {/* Menghitung Hari */}
+          <section ref={sectionRefs.menghitungHari as any} className="scroll-mt-24">
+            <AnimatedSection type="scale" delay={0.5}>
+              <MenghitungHariContent />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider delay={0.1} />
 
-          {/* Doa - fade up */}
-          <AnimatedSection type="fade-up" delay={0.5}>
-            <DoaContent />
-          </AnimatedSection>
+          {/* Doa */}
+          <section ref={sectionRefs.doa as any} className="scroll-mt-24">
+            <AnimatedSection type="fade-up" delay={0.5}>
+              <DoaContent />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider delay={0.1} />
 
-          {/* RSVP - scale for important call-to-action */}
-          <AnimatedSection type="scale" delay={0.5}>
-            <RSVPContent />
-          </AnimatedSection>
+          {/* RSVP */}
+          <section ref={sectionRefs.rsvp as any} className="scroll-mt-24">
+            {/* ✅ CTA anchor (fallback): engine will scroll here with block:center */}
+            <div
+              ref={sectionRefs.rsvpCTA as any}
+              aria-hidden="true"
+              className="h-px w-full"
+            />
+
+            <AnimatedSection type="scale" delay={0.5}>
+              <RSVPContent ctaRef={sectionRefs.rsvpCTA as any} />
+            </AnimatedSection>
+          </section>
 
           <AnimatedDivider delay={0.1} />
 
-          {/* Response - fade up */}
+          {/* Responses */}
+          <section ref={sectionRefs.responses as any} className="scroll-mt-24">
             <ResponseContent />
-
+          </section>
         </div>
       </div>
 

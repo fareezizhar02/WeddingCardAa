@@ -5,7 +5,14 @@ import { useState } from 'react'
 import { Mail } from 'lucide-react'
 import RSVPSheet from './RSVPSheet'
 
-export default function RSVPContent() {
+type RSVPContentProps = {
+  /**
+   * Optional ref used by auto-scroll engine to center the RSVP CTA button.
+   */
+  ctaRef?: React.Ref<HTMLButtonElement>
+}
+
+export default function RSVPContent({ ctaRef }: RSVPContentProps) {
   const [isRSVPSheetOpen, setIsRSVPSheetOpen] = useState(false)
 
   const containerVariants = {
@@ -68,6 +75,7 @@ export default function RSVPContent() {
         {/* RSVP Button */}
         <motion.div variants={itemVariants}>
           <button
+            ref={ctaRef}
             type="button"
             onClick={() => setIsRSVPSheetOpen(true)}
             className="
