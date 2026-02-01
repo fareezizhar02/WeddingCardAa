@@ -37,8 +37,35 @@ const greatVibes = Great_Vibes({
 })
 
 export const metadata: Metadata = {
-  title: 'Fareez & Zanis - Wedding Invitation',
-  description: 'You are cordially invited to celebrate the wedding of Fareez and Zanis',
+  title: 'Fareez & Zanis – Wedding Invitation',
+  description:
+    'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis.',
+
+  openGraph: {
+    title: 'Jemputan Perkahwinan Fareez & Zanis',
+      description:
+        'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis',
+    url: 'https://lakar-fareezanis.vercel.app',
+    siteName: 'Walimatulurus Fareez & Zanis',
+    images: [
+      {
+        url: 'https://lakar-fareezanis.vercel.app/images/thumbnail.png',
+        width: 1200,
+        height: 630,
+        alt: 'Jemputan Perkahwinan Fareez & Zanis',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Jemputan Perkahwinan Fareez & Zanis',
+    description:
+      'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis.',
+    images: ['https://lakar-fareezanis.vercel.app/images/thumbnail.png'],
+  },
 };
 
 export const viewport = {
