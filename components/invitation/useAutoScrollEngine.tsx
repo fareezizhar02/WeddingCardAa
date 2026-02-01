@@ -34,96 +34,22 @@ function getScrollEl(): HTMLElement {
   return (document.scrollingElement || document.documentElement) as HTMLElement;
 }
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
+async function scrollToEl(el: HTMLElement, block: ScrollLogicalPosition = 'start') {
+  el.scrollIntoView({ behavior: 'smooth', block });
 
-function easeInOutCubic(t: number) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+  const start = performance.now();
+  let last = getScrollEl().scrollTop;
+  let stable = 0;
 
-function prefersReducedMotion() {
-  return typeof window !== "undefined" &&
-    window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function getScrollMarginTop(el: HTMLElement) {
-  const v = window.getComputedStyle(el).scrollMarginTop;
-  const n = parseFloat(v || "0");
-  return Number.isFinite(n) ? n : 0;
-}
-
-function getTargetScrollTop(el: HTMLElement, block: ScrollLogicalPosition) {
-  const scroller = getScrollEl();
-  const current = scroller.scrollTop;
-
-  const rect = el.getBoundingClientRect();
-  const elTop = rect.top + current;
-
-  const marginTop = getScrollMarginTop(el);
-
-  if (block === "center") {
-    const viewportH = window.innerHeight || scroller.clientHeight || 0;
-    const elCenter = elTop + rect.height / 2;
-    return elCenter - viewportH / 2; // center (no scroll-mt)
+  while (performance.now() - start < 2500) {
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    const now = getScrollEl().scrollTop;
+    if (Math.abs(now - last) < 0.5) stable += 1;
+    else stable = 0;
+    if (stable >= 6) return;
+    last = now;
   }
-
-  // default: start (respect scroll-mt / scrollMarginTop)
-  return elTop - marginTop;
 }
-
-/**
- * Cinematic scroll:
- * - duration depends on distance
- * - cancels if shouldCancel() becomes true
- */
-async function scrollToEl(
-  el: HTMLElement,
-  block: ScrollLogicalPosition = "start",
-  shouldCancel?: () => boolean
-) {
-  const scroller = getScrollEl();
-
-  // reduced motion: jump
-  if (prefersReducedMotion()) {
-    const target = clamp(getTargetScrollTop(el, block), 0, scroller.scrollHeight - scroller.clientHeight);
-    scroller.scrollTop = target;
-    return;
-  }
-
-  const start = scroller.scrollTop;
-  const rawTarget = getTargetScrollTop(el, block);
-  const maxScroll = scroller.scrollHeight - scroller.clientHeight;
-  const target = clamp(rawTarget, 0, maxScroll);
-
-  const distance = Math.abs(target - start);
-
-  // ✅ cinematic duration based on distance
-  // tweak numbers freely:
-  const duration = clamp(650 + distance * 0.7, 900, 3200);
-
-  if (distance < 2) return;
-
-  const startTime = performance.now();
-
-  return new Promise<void>((resolve) => {
-    const tick = (now: number) => {
-      if (shouldCancel?.()) return resolve();
-
-      const t = clamp((now - startTime) / duration, 0, 1);
-      const eased = easeInOutCubic(t);
-
-      scroller.scrollTop = start + (target - start) * eased;
-
-      if (t < 1) requestAnimationFrame(tick);
-      else resolve();
-    };
-
-    requestAnimationFrame(tick);
-  });
-}
-
 
 export function useAutoScrollEngine({
   enabled,
@@ -190,11 +116,10 @@ export function useAutoScrollEngine({
 
     const getEl = (k: SectionKey) => sectionRefs[k]?.current || null;
 
-    // MUKADIMAH SKIPPED
     const contentTop = getEl('contentTop');
     if (!contentTop) return;
 
-    await scrollToEl(contentTop, "start", () => stopReasonRef.current !== "none");
+    await scrollToEl(contentTop, 'start');
     if (stopReasonRef.current !== 'none') return;
     await sleep(7000);
 
@@ -207,28 +132,28 @@ export function useAutoScrollEngine({
 
     const details = getEl('details');
     if (details) {
-      await scrollToEl(details, "start", () => stopReasonRef.current !== "none");
+      await scrollToEl(details, 'start');
       if (stopReasonRef.current !== 'none') return;
       await sleep(5000);
     }
 
     const aturcara = getEl('aturcara');
     if (aturcara) {
-      await scrollToEl(aturcara, "start", () => stopReasonRef.current !== "none");
+      await scrollToEl(aturcara, 'start');
       if (stopReasonRef.current !== 'none') return;
       await sleep(3000);
     }
 
     const menghitungHari = getEl('menghitungHari');
     if (menghitungHari) {
-      await scrollToEl(menghitungHari, "start", () => stopReasonRef.current !== "none");
+      await scrollToEl(menghitungHari, 'start');
       if (stopReasonRef.current !== 'none') return;
       await sleep(3000);
     }
 
     const doa = getEl('doa');
     if (doa) {
-      await scrollToEl(doa, "start", () => stopReasonRef.current !== "none");
+      await scrollToEl(doa, 'start');
       if (stopReasonRef.current !== 'none') return;
       await sleep(800);
       pauseAtDoa();
@@ -237,13 +162,13 @@ export function useAutoScrollEngine({
 
     const rsvpTarget = getEl('rsvpCTA') || getEl('rsvp');
     if (rsvpTarget) {
-      await scrollToEl(rsvpTarget, 'center', () => stopReasonRef.current !== 'none');
+      await scrollToEl(rsvpTarget, 'center');
       if (stopReasonRef.current !== 'none') return;
       await sleep(5000);
     }
 
     const responses = getEl('responses');
-    if (responses) await scrollToEl(responses, 'start', () => stopReasonRef.current !== 'none');
+    if (responses) await scrollToEl(responses, 'start');
 
     markDone();
   }, [enabled, sectionRefs, pauseAtDoa, markDone]);
