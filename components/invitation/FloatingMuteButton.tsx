@@ -48,6 +48,7 @@ export default function FloatingMuteButton({ audioRef }: FloatingMuteButtonProps
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.1 }}
       onClick={toggleMute}
+      data-autoscroll-safe="true"
       className="
         fixed
         bottom-24

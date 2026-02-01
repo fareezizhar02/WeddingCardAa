@@ -87,7 +87,15 @@ export default function InvitationPage() {
       if (keys.includes(e.key)) stop();
     };
 
-    const onMouseDown = () => stop();
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      // ✅ kalau klik dekat UI controls, jangan stop
+      if (target.closest('[data-autoscroll-safe="true"]')) return;
+
+      stop();
+    };
 
     const onFocusIn = (e: FocusEvent) => {
       const t = e.target as HTMLElement | null;
