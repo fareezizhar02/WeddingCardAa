@@ -101,7 +101,7 @@ async function scrollToEl(
 
   // ✅ cinematic duration based on distance
   // tweak numbers freely:
-  const duration = clamp(650 + distance * 0.7, 900, 3200); // ms
+  const duration = clamp(450 + distance * 0.35, 650, 2000); // ms
 
   if (distance < 2) return;
 
