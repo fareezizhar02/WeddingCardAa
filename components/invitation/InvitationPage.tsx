@@ -55,7 +55,7 @@ export default function InvitationPage() {
   const autoScroll = useAutoScrollEngine({
     enabled: engineEnabled,
     sectionRefs,
-    startDelayMs: 5500,
+    startDelayMs: 6500,
     resumeChipDelayMs: 2000,
   });
 
@@ -174,26 +174,34 @@ export default function InvitationPage() {
 
       {/* Page Content */}
       <div className="relative">
-        {currentPage === "cover" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-            <div className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 md:px-8 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
-              <InvitationCard />
-            </div>
+  <AnimatePresence mode="wait">
+    {hasEntered && currentPage === "cover" && (
+      <motion.div
+        key="cover-content"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 md:px-8 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
+          <InvitationCard />
+        </div>
 
-            <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
-              <ContentCard sectionRefs={sectionRefs} />
-            </div>
+        <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
+          <ContentCard sectionRefs={sectionRefs} />
+        </div>
 
-            <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
-              <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
-                Direka Oleh <br />
-                <span className="font-semibold text-stone-700">FareeZanis</span>
-              </p>
-            </div>
+        <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
+          <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
+            Direka Oleh <br />
+            <span className="font-semibold text-stone-700">FareeZanis</span>
+          </p>
+        </div>
 
-            <div className="h-20 sm:h-24 bg-gradient-to-br from-cream-50 to-amber-50/20" />
-          </motion.div>
-        )}
+        <div className="h-20 sm:h-24 bg-gradient-to-br from-cream-50 to-amber-50/20" />
+      </motion.div>
+    )}
+  </AnimatePresence>
 
         {currentPage === "music" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-32 md:px-8 md:py-16 flex items-center justify-center">

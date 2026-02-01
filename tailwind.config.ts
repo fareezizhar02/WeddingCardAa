@@ -25,8 +25,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ['var(--font-cormorant)', 'Georgia', 'serif'],
-        sans: ['var(--font-montserrat)', 'system-ui', 'sans-serif'],
+        montserrat: ["var(--font-montserrat)", "ui-sans-serif", "system-ui"],
+        playfair: ["var(--font-playfair)", "ui-serif", "Georgia"],
+        greatvibes: ["var(--font-greatvibes)", "cursive"],
       },
     },
   },
