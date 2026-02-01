@@ -13,8 +13,9 @@ import AnimatedDivider from './AnimatedDivider'
 import type { SectionRefs } from './useAutoScrollEngine'
 
 type Props = {
-  sectionRefs: SectionRefs
-}
+  sectionRefs: SectionRefs;
+  onUserScrollDoa?: () => void;
+};
 
 /**
  * ContentCard Component
@@ -22,7 +23,7 @@ type Props = {
  * Main content card with scroll-triggered animations.
  * Each section animates into view as user scrolls down.
  */
-export default function ContentCard({ sectionRefs }: Props) {
+export default function ContentCard({ sectionRefs, onUserScrollDoa }: Props) {
   const cardVariants = {
     initial: { opacity: 0, scale: 0.95 },
     animate: {
@@ -105,7 +106,7 @@ export default function ContentCard({ sectionRefs }: Props) {
           {/* Doa */}
           <section ref={sectionRefs.doa as any} className="scroll-mt-24">
             <AnimatedSection type="fade-up" delay={0.5}>
-              <DoaContent />
+              <DoaContent onUserScrollDoa={onUserScrollDoa} />
             </AnimatedSection>
           </section>
 

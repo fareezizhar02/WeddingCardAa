@@ -115,6 +115,42 @@ export default function InvitationPage() {
     };
   }, [engineEnabled, autoScroll.engineState, autoScroll.stopByUser]);
 
+  useEffect(() => {
+  if (!engineEnabled) return;
+
+  // hanya masa doa pause / chip visible
+  if (autoScroll.engineState !== "paused_doa" && !autoScroll.showResumeChip) return;
+
+  const dismiss = () => autoScroll.dismissResumeChipByUser();
+
+  const onWheel = () => dismiss();
+  const onTouchMove = () => dismiss();
+  const onMouseDown = () => dismiss();
+  const onKeyDown = (e: KeyboardEvent) => {
+    const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
+    if (keys.includes(e.key)) dismiss();
+  };
+
+  window.addEventListener("wheel", onWheel, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: true });
+  window.addEventListener("mousedown", onMouseDown);
+  window.addEventListener("keydown", onKeyDown);
+
+  return () => {
+    window.removeEventListener("wheel", onWheel);
+    window.removeEventListener("touchmove", onTouchMove);
+    window.removeEventListener("mousedown", onMouseDown);
+    window.removeEventListener("keydown", onKeyDown);
+  };
+}, [
+  engineEnabled,
+  autoScroll.engineState,
+  autoScroll.showResumeChip,
+  autoScroll.dismissResumeChipByUser,
+]);
+
+
+
   const handleEnter = async () => {
     window.scrollTo(0, 0);
     setHasEntered(true);
@@ -164,7 +200,9 @@ export default function InvitationPage() {
         <source src="/music/MusicBackground.mp3" type="audio/mpeg" />
       </audio>
 
-      <AnimatePresence>{!hasEntered && <EntranceScreen onEnter={handleEnter} />}</AnimatePresence>
+      <AnimatePresence>
+        {!hasEntered && <EntranceScreen onEnter={handleEnter} />}
+      </AnimatePresence>
 
       {/* Fixed Background */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
@@ -174,38 +212,52 @@ export default function InvitationPage() {
 
       {/* Page Content */}
       <div className="relative">
-  <AnimatePresence mode="wait">
-    {hasEntered && currentPage === "cover" && (
-      <motion.div
-        key="cover-content"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 md:px-8 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
-          <InvitationCard />
-        </div>
+        <AnimatePresence mode="wait">
+          {hasEntered && currentPage === "cover" && (
+            <motion.div
+              key="cover-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 md:px-8 bg-gradient-to-br from-cream-100 via-amber-50/50 to-stone-100">
+                <InvitationCard />
+              </div>
 
-        <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
-          <ContentCard sectionRefs={sectionRefs} />
-        </div>
+              <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
+                <ContentCard
+                  sectionRefs={sectionRefs}
+                  onUserScrollDoa={() => autoScroll.dismissResumeChipByUser()}
+                />
+              </div>
 
-        <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
-          <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
-            Direka Oleh <br />
-            <span className="font-semibold text-stone-700">FareeZanis</span>
-          </p>
-        </div>
+              <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
+                <p className="font-playfair text-[13px] sm:text-[14px] text-stone-600 tracking-wide">
+                  Direka Oleh <br />
+                  <span className="font-semibold text-stone-700">
+                    FareeZanis
+                  </span>
+                </p>
+              </div>
 
-        <div className="h-20 sm:h-24 bg-gradient-to-br from-cream-50 to-amber-50/20" />
-      </motion.div>
-    )}
-  </AnimatePresence>
+              <div className="h-20 sm:h-24 bg-gradient-to-br from-cream-50 to-amber-50/20" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {currentPage === "music" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-32 md:px-8 md:py-16 flex items-center justify-center">
-            <MusicSection audioRef={audioRef} isPlaying={isPlaying} onPlayPause={togglePlayPause} />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="min-h-screen px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-32 md:px-8 md:py-16 flex items-center justify-center"
+          >
+            <MusicSection
+              audioRef={audioRef}
+              isPlaying={isPlaying}
+              onPlayPause={togglePlayPause}
+            />
             <button
               onClick={goToCoverPage}
               className="fixed top-6 left-6 px-4 py-2 bg-white/80 backdrop-blur-sm text-amber-800 rounded-full font-medium text-sm shadow-md hover:bg-white hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-300/50 z-30"
@@ -229,28 +281,36 @@ export default function InvitationPage() {
       )}
 
       {/* ✅ Auto-scroll indicator (replaces old "Scroll" hint) */}
-      {hasEntered && currentPage === "cover" && autoScroll.engineState === "running" && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 6 }}
-          transition={{ duration: 0.35 }}
-          className="fixed inset-x-0 z-[60] flex justify-center pointer-events-none"
-          style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}
-        >
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/55 backdrop-blur-md border border-white/40 shadow-[0_10px_25px_rgba(0,0,0,0.10)] text-stone-700">
-            <span className="text-[11px] tracking-[0.28em] uppercase">Auto-scroll</span>
-            <motion.span
-              aria-hidden
-              animate={{ opacity: [0.35, 1, 0.35] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-              className="text-[12px] leading-none"
-            >
-              •••
-            </motion.span>
-          </div>
-        </motion.div>
-      )}
+      {hasEntered &&
+        currentPage === "cover" &&
+        autoScroll.engineState === "running" && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.35 }}
+            className="fixed inset-x-0 z-[60] flex justify-center pointer-events-none"
+            style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}
+          >
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/55 backdrop-blur-md border border-white/40 shadow-[0_10px_25px_rgba(0,0,0,0.10)] text-stone-700">
+              <span className="text-[11px] tracking-[0.28em] uppercase">
+                Auto-scroll
+              </span>
+              <motion.span
+                aria-hidden
+                animate={{ opacity: [0.35, 1, 0.35] }}
+                transition={{
+                  duration: 1.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="text-[12px] leading-none"
+              >
+                •••
+              </motion.span>
+            </div>
+          </motion.div>
+        )}
 
       <AutoScrollResumeChip visible={autoScroll.showResumeChip} onResume={autoScroll.resumeFromDoa} />
 

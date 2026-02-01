@@ -163,6 +163,15 @@ export function useAutoScrollEngine({
     window.scrollTo({ top: window.scrollY, behavior: 'auto' });
   }, [clearTimers, engineState]);
 
+  const dismissResumeChipByUser = React.useCallback(() => {
+  if (stopReasonRef.current !== 'none') return;
+
+  stopReasonRef.current = 'user';
+  clearTimers();
+  setShowResumeChip(false);
+  setEngineState('stopped_user');
+}, [clearTimers]);
+
   const markDone = React.useCallback(() => {
     stopReasonRef.current = 'done';
     clearTimers();
@@ -230,7 +239,7 @@ export function useAutoScrollEngine({
     if (doa) {
       await scrollToEl(doa, "start", () => stopReasonRef.current !== "none");
       if (stopReasonRef.current !== 'none') return;
-      await sleep(800);
+      await sleep(0);
       pauseAtDoa();
       return;
     }
@@ -304,5 +313,6 @@ export function useAutoScrollEngine({
     start,
     resumeFromDoa,
     stopByUser,
+    dismissResumeChipByUser, 
   };
 }

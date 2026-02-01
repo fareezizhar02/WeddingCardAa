@@ -1,49 +1,55 @@
-'use client';
+import { motion, AnimatePresence } from "framer-motion";
 
-import { motion, AnimatePresence } from 'framer-motion';
-
-type Props = {
+export default function AutoScrollResumeChip({
+  visible,
+  onResume,
+}: {
   visible: boolean;
   onResume: () => void;
-};
-
-export default function AutoScrollResumeChip({ visible, onResume }: Props) {
+}) {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.button
-          type="button"
+        <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          onClick={onResume}
-          className="
-            fixed
-            inset-x-0
-            mx-auto
-            w-fit
-            z-[80]
-            px-4
-            py-2
-            rounded-full
-            bg-white/70
-            backdrop-blur-md
-            border border-white/40
-            shadow-[0_10px_25px_rgba(0,0,0,0.12)]
-            text-stone-700
-            text-[12px]
-            tracking-[0.22em]
-            uppercase
-            pointer-events-auto
-            select-none
-          "
-          style={{
-            bottom: 'calc(env(safe-area-inset-bottom) + 96px)', // adjust ikut appbar
-          }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-x-0 z-[80] flex justify-center pointer-events-none"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 128px)" }}
         >
-          Sambung
-        </motion.button>
+          <motion.button
+            type="button"
+            onClick={onResume}
+            className="
+              pointer-events-auto
+              inline-flex items-center gap-2
+              rounded-full
+              px-5 py-3
+              bg-stone-900/85
+              text-white
+              border border-white/15
+              shadow-[0_14px_35px_rgba(0,0,0,0.25)]
+              backdrop-blur-md
+              font-montserrat
+              text-[12px]
+              tracking-[0.18em]
+              uppercase
+              active:scale-[0.98]
+              focus:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-white/35
+            "
+            aria-label="Sambung auto-scroll"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            animate={{ boxShadow: ["0_14px_35px_rgba(0,0,0,0.20)", "0_14px_35px_rgba(0,0,0,0.35)", "0_14px_35px_rgba(0,0,0,0.20)"] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <span className="text-[14px] leading-none">▶</span>
+            Sambung Auto-scroll
+          </motion.button>
+        </motion.div>
       )}
     </AnimatePresence>
   );
