@@ -25,7 +25,7 @@ export default function DoaContent({
   }
 
   const scrollRef = useRef<HTMLDivElement | null>(null)
-  const [showScrollCue, setShowScrollCue] = useState(false)
+  const [showScrollCue, setShowScrollCue] = useState(true)
 
   // Show cue only if content is actually scrollable
   useEffect(() => {
@@ -128,6 +128,8 @@ export default function DoaContent({
 
         {/* Scroll area */}
         <div
+          ref={scrollRef}
+          onScroll={handleScroll}
           data-doa-scroll="true" 
           className="scroll-minimal max-h-[52vh] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6"
         >
