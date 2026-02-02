@@ -126,14 +126,41 @@ export default function InvitationPage() {
   useEffect(() => {
   if (!engineEnabled) return;
 
-  // hanya masa doa pause / chip visible
   if (autoScroll.engineState !== "paused_doa" && !autoScroll.showResumeChip) return;
+
+  const isSafeTarget = (target: EventTarget | null) => {
+    const el = target as HTMLElement | null;
+    if (!el) return false;
+    return !!el.closest('[data-autoscroll-safe="true"]');
+  };
 
   const dismiss = () => autoScroll.dismissResumeChipByUser();
 
-  const onWheel = () => dismiss();
-  const onTouchMove = () => dismiss();
-  const onMouseDown = () => dismiss();
+  const onWheel = (e: WheelEvent) => {
+  if (isSafeTarget(e.target)) return;
+  if (isInsideDoaScroll(e.target)) return;
+  dismiss();
+};
+
+
+  const isInsideDoaScroll = (target: EventTarget | null) => {
+  const el = target as HTMLElement | null;
+  if (!el) return false;
+  return !!el.closest('[data-doa-scroll="true"]');
+};
+
+const onTouchMove = (e: TouchEvent) => {
+  if (isSafeTarget(e.target)) return;
+  if (isInsideDoaScroll(e.target)) return; // ✅ scroll doa = ignore
+  dismiss();
+};
+
+
+  const onMouseDown = (e: MouseEvent) => {
+    if (isSafeTarget(e.target)) return; // ✅ INI YANG PENTING UNTUK RESUME CHIP
+    dismiss();
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
     const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
     if (keys.includes(e.key)) dismiss();
@@ -156,6 +183,7 @@ export default function InvitationPage() {
   autoScroll.showResumeChip,
   autoScroll.dismissResumeChipByUser,
 ]);
+
 
 
 
@@ -234,10 +262,7 @@ export default function InvitationPage() {
               </div>
 
               <div className="min-h-screen flex items-start justify-center px-0 sm:px-6 md:px-8 py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">
-                <ContentCard
-                  sectionRefs={sectionRefs}
-                  onUserScrollDoa={() => autoScroll.dismissResumeChipByUser()}
-                />
+                <ContentCard sectionRefs={sectionRefs} onUserScrollDoa={() => {}} />
               </div>
 
               <div className="flex items-center justify-center py-0 sm:py-2 bg-gradient-to-br from-cream-50 to-amber-50/20">

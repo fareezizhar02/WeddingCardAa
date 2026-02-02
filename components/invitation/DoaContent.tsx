@@ -128,13 +128,7 @@ export default function DoaContent({
 
         {/* Scroll area */}
         <div
-          ref={scrollRef}
-          onScroll={(e) => {
-            const el = e.currentTarget;
-            if (el.scrollTop > 8) onUserScrollDoa?.();
-          }}
-          onWheel={() => onUserScrollDoa?.()}
-          onTouchMove={() => onUserScrollDoa?.()}
+          data-doa-scroll="true" 
           className="scroll-minimal max-h-[52vh] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6"
         >
           <div className="space-y-5 text-center">

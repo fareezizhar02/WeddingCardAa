@@ -21,6 +21,7 @@ export default function AutoScrollResumeChip({
           <motion.button
             type="button"
             onClick={onResume}
+            data-autoscroll-safe="true"
             className="
               pointer-events-auto
               inline-flex items-center gap-2

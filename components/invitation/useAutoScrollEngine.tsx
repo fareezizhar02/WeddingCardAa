@@ -191,6 +191,23 @@ export function useAutoScrollEngine({
     }, resumeChipDelayMs);
   }, [clearTimers, resumeChipDelayMs]);
 
+  const snoozeResumeChip = React.useCallback((ms: number = 1200) => {
+  if (engineState !== 'paused_doa') return;
+  if (stopReasonRef.current !== 'none') return;
+
+  // hide now
+  setShowResumeChip(false);
+
+  // re-show after idle
+  if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  resumeTimerRef.current = setTimeout(() => {
+    if (stopReasonRef.current === 'none' && engineState === 'paused_doa') {
+      setShowResumeChip(true);
+    }
+  }, ms);
+}, [engineState]);
+
+
   const run = React.useCallback(async () => {
     if (!enabled) return;
     if (stopReasonRef.current !== 'none') return;
@@ -314,5 +331,6 @@ export function useAutoScrollEngine({
     resumeFromDoa,
     stopByUser,
     dismissResumeChipByUser, 
+    snoozeResumeChip,
   };
 }
