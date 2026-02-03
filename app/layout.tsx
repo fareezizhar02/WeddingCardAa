@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: 'Walimatulurus Fareez & Zanis',
     images: [
       {
-        url: 'https://lakar-fareezanis.vercel.app/images/thumbnail.png',
+        url: 'https://lakar-fareezanis.vercel.app/images/thumbnail_aa.png',
         width: 1200,
         height: 630,
         alt: 'Jemputan Perkahwinan Fareez & Zanis',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: 'Jemputan Perkahwinan Fareez & Zanis',
     description:
       'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis.',
-    images: ['https://lakar-fareezanis.vercel.app/images/thumbnail.png'],
+    images: ['https://lakar-fareezanis.vercel.app/images/thumbnail_aa.png'],
   },
 };
 
