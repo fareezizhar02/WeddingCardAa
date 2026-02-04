@@ -37,6 +37,8 @@ const greatVibes = Great_Vibes({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://lakar-fareezanis.vercel.app'),
+
   title: 'Fareez & Zanis – Wedding Invitation',
   description:
     'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis.',
@@ -45,17 +47,17 @@ export const metadata: Metadata = {
     title: 'Jemputan Perkahwinan Fareez & Zanis',
       description:
         'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis',
-    url: 'https://lakar-fareezanis.vercel.app',
+    url: '/',
     siteName: 'Walimatulurus Fareez & Zanis',
     images: [
       {
-        url: 'https://lakar-fareezanis.vercel.app/images/thumbnail_aa.png',
+        url: '/images/thumbnail_aa.png',
         width: 1200,
         height: 630,
         alt: 'Jemputan Perkahwinan Fareez & Zanis',
       },
     ],
-    locale: 'en_US',
+    locale: 'ms_MY',
     type: 'website',
   },
 
@@ -64,7 +66,7 @@ export const metadata: Metadata = {
     title: 'Jemputan Perkahwinan Fareez & Zanis',
     description:
       'Dengan penuh kesyukuran, kami menjemput anda ke majlis perkahwinan Fareez & Zanis.',
-    images: ['https://lakar-fareezanis.vercel.app/images/thumbnail_aa.png'],
+    images: ['/images/thumbnail_aa.png'],
   },
 };
 
